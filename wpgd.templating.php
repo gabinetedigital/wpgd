@@ -1,5 +1,6 @@
-<?php
+<?php /* -*- Mode: php; c-basic-offset:4; -*- */
 /* Copyright (C) 2011  Lincoln de Sousa <lincoln@comum.org>
+ * Copyright (C) 2011  Governo do Estado do Rio Grande do Sul
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -15,20 +16,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-Plugin Name: WpGD
-Plugin URI: http://trac.gabinetedigital.rs.gov.br
-Description: Interaction of the gd tools with wordpress
-Version: 0.1.0
-Author: Lincoln de Sousa <lincoln@gg.rs.gov.br>
-Author URI: http://gabinetedigital.rs.gov.br
-License: AGPL3
-*/
+include 'Twig/Autoloader.php';
+Twig_Autoloader::register();
 
+/**
+ * A template renderer engine based on the `twig' library.
+ */
+class WpGdTemplatingRenderer {
+    private $twig = null;
 
-include("wpgd.thumbs.php");
-include("wpgd.admin.php");
+    function __construct() {
+        $path = join('/', array(dirname(__FILE__), 'templates'));
+        $loader = new Twig_Loader_Filesystem($path);
+        $this->twig = new Twig_Environment($loader);
+    }
 
-wpgd_thumbs_init_sizes();
-
-?>
+    public function render($templateName, $context=array()) {
+        $template = $this->twig->loadTemplate($templateName);
+        return $template->render($context);
+    }
+}
