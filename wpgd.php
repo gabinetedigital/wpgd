@@ -28,6 +28,7 @@ License: AGPL3
 
 include("wpgd.thumbs.php");
 include("wpgd.admin.php");
+include("wpgd.admin.videos.php");
 
 wpgd_thumbs_init_sizes();
 

@@ -1,0 +1,104 @@
+<div class="wrap">
+  <div id="icon-edit" class="icon32 icon32-posts-post"><br></div>
+  <h2>Add New Video</h2>
+  <form id="video" method="post" class="form-wrap">
+    <div class="metabox-holder">
+      <div id="poststuff">
+
+        <div id="col-right" style="width:49%">
+
+          <div class="stuffbox">
+            <h3>Video size</h3>
+            <div class="form-field form-required">
+              <label>Width</label>
+              <input type="text">
+            </div>
+            <div class="form-field form-required">
+              <label>Height</label>
+              <input type="text">
+            </div>
+          </div> <!-- stuffbox videosize -->
+
+          <div class="stuffbox">
+            <h3>Sources</h3>
+
+            <div class="form-field form-required">
+              <div id="col-right" style="width:72%">
+                <div class="col-wrap">
+                  <label>URL</label>
+                  <input type="text" name="Source" style="width:90%">
+                  <button class="button">+</button>
+                </div>
+              </div>
+
+              <div id="col-left" style="width:25%">
+                <div class="col-wrap">
+                  <label>Format</label>
+                  <select>
+                    <option value='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+                      MP4
+                    </option>
+                    <option value='video/webm; codecs="vp8, vorbis"'>
+                      WebM/Vorbis
+                    </option>
+                    <option value='video/ogg; codecs="theora, vorbis"'>
+                      Ogg/Vorbis
+                    </option>
+                    <option value="video/x-flv">
+                      Flash
+                    </option>
+                  </select>
+                </div>
+              </div>
+            </div>
+          </div> <!-- stuffbox sources -->
+
+        </div> <!-- #col-right -->
+
+        <div id="col-left" class="stuffbox" style="width:48%">
+          <h3>Metadata</h3>
+          <div class="form-field form-required">
+            <label>Title</label>
+            <input type="text" name="title" id="title">
+            <p>A user visible text that describes the video</p>
+          </div>
+
+          <div class="form-field">
+            <label>Date</label>
+            <input type="text" name="title" id="title">
+            <p>This is the date that will be shown to the end user</p>
+          </div>
+
+          <div class="form-field form-required">
+            <label>Author</label>
+            <input type="text" name="title" id="title">
+            <p>The author's name (More than one values are accepted)</p>
+          </div>
+
+          <div class="form-field form-required">
+            <label>License</label>
+            <select>
+              <option value="text"></option>
+            </select>
+          </div>
+
+          <div class="form-field form-required">
+            <label>Description</label>
+            <textarea></textarea>
+            <p>
+              Another user visible text, but with more details about the
+              video.
+            </p>
+          </div>
+        </div> <!-- #col-left -->
+
+
+        <p class="submit">
+          <button class="button">Add new video</button>
+        </p>
+
+      </div> <!-- #poststuff -->
+
+    </div> <!-- .metabox-holder -->
+  </form>
+</div>
