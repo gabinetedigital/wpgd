@@ -31,6 +31,10 @@ function wpgd_videos_menu() {
         $menupage, 'Add New', 'Add New',
         'manage_options', 'gd-videos-add', 'wpgd_videos_submenu_add');
 
+    add_submenu_page(
+        $menupage, 'Videos in home', 'Videos in home',
+        'manage_options', 'gd-videos-home', 'wpgd_videos_submenu_home');
+
 }
 
 
@@ -39,9 +43,16 @@ function wpgd_videos_submenu_allvideos() {
     echo $renderer->render('admin/videos/listing.html');
 }
 
+
 function wpgd_videos_submenu_add() {
     global $renderer;
     echo $renderer->render('admin/videos/add.html');
+}
+
+
+function wpgd_videos_submenu_home() {
+    global $renderer;
+    echo $renderer->render('admin/videos/home.html');
 }
 
 ?>
