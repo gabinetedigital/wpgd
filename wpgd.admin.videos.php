@@ -63,6 +63,9 @@ function wpgd_videos_menu() {
         $menupage, 'Videos in home', 'Videos in home',
         'manage_options', 'gd-videos-home', 'wpgd_videos_submenu_home');
 
+    add_submenu_page(
+        null, 'Edit Video', 'Edit Video',
+        'manage_options', 'gd-videos-edit', 'wpgd_videos_submenu_edit');
 }
 
 
@@ -78,6 +81,11 @@ function wpgd_videos_submenu_allvideos() {
 function wpgd_videos_submenu_add() {
     global $renderer;
     echo $renderer->render('admin/videos/add.html', _process_add());
+}
+
+function wpgd_videos_submenu_edit() {
+    global $renderer;
+    echo $renderer->render('admin/videos/add.html', _process_edit());
 }
 
 
@@ -111,6 +119,45 @@ function _process_listing() {
             id, title, date, author, description, thumbnail, status
         FROM $videos";
     $ctx['listing'] = $wpdb->get_results($wpdb->prepare($sql));
+    return $ctx;
+}
+
+
+function _process_edit() {
+    global $wpdb;
+    $video_id = $_REQUEST['video_id'];
+    $videos_table = $wpdb->prefix . "wpgd_admin_videos";
+    $sources_table = $wpdb->prefix . "wpgd_admin_videos_sources";
+    $ctx = array('edit' => true);
+
+    /* Getting the video attributes */
+    $sql = "
+        SELECT
+            id, title, date, author, description, thumbnail,
+            status, video_width, video_height
+        FROM $videos_table
+        WHERE id = " . $video_id;
+    $ctx['fields'] = $wpdb->get_row($wpdb->prepare($sql));
+
+    /* Listing the sources */
+    $sql = "
+        SELECT id, format, url FROM $sources_table
+        WHERE video_id = " . $video_id;
+    $ctx['source_fields'] = $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+
+    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        /* Validating the rest of the form */
+        try {
+            $_validated = __validate_form();
+            $fields = $_validated['fields'];
+            $sources = $_validated['sources'];
+        } catch (ValidationException $exc) {
+            $ctx = array_merge($ctx, $exc->getErrors());
+            $ctx['fields']['id'] = $video_id;
+            return $ctx;
+        }
+    }
+
     return $ctx;
 }
 

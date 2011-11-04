@@ -17,11 +17,16 @@
           <img alt="{{ video.title }}" src="{{ video.thumbnail }}">
         </td>
         <td>
-          <strong><a href="#">{{ video.title }}</a></strong>
+          <strong>
+            <a href="admin.php?page=gd-videos-edit&video_id={{ video.id }}">
+              {{ video.title }}
+            </a>
+          </strong>
 
           <div class="row-actions">
             <span class="edit">
-              <a href="#" title="Edit this item">Edit</a> |
+              <a href="admin.php?page=gd-videos-edit&video_id={{ video.id }}"
+                 title="Edit this item">Edit</a> |
             </span>
             <span class="trash">
               <a href="#" title="Remove this item">Remove</a>

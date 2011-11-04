@@ -1,7 +1,17 @@
 <div class="wrap">
   <div id="icon-edit" class="icon32 icon32-posts-post"><br></div>
+  {% if edit %}
+  <h2>Edit Video</h2>
+  {% else %}
   <h2>Add New Video</h2>
-  <form id="video" method="post" class="form-wrap" action="admin.php?page=gd-videos-add">
+  {% endif %}
+  <form id="video" method="post" class="form-wrap"
+        {% if edit %}
+        action="admin.php?page=gd-videos-edit&video_id={{ fields.id }}"
+        {% else %}
+        action="admin.php?page=gd-videos-add"
+        {% endif %}
+        >
     <div class="metabox-holder">
       <div id="poststuff">
 
@@ -155,8 +165,10 @@
             <h3>Publishing options</h3>
             <div class="form-field">
               <label>
-                <input type="checkbox" name="status" value="1">
-                Publish after creating
+                <input
+                   {% if video.status %}checked="checked"{% endif %}
+                   type="checkbox" name="status" value="1">
+                Publish video
               </label>
             </div>
           </div>
@@ -210,7 +222,8 @@
 
         <p class="submit">
           <button class="button">
-            Add video
+            {% if edit %}Edit{% else %}Add{% endif %}
+            video
           </button>
         </p>
 
