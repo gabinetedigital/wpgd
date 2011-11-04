@@ -30,7 +30,7 @@
         </td>
         <td class="column-title">{{ video.description }}</td>
         <td>
-          Published
+          {% if not video.status %}Not{% endif %} Published
         </td>
       </tr>
       {% endfor %}

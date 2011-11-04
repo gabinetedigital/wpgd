@@ -106,7 +106,10 @@ function _process_listing() {
     $ctx = array();
 
     $videos = $wpdb->prefix . "wpgd_admin_videos";
-    $sql = "SELECT id, title, date, author, description FROM $videos";
+    $sql = "
+        SELECT
+            id, title, date, author, description, status
+        FROM $videos";
     $ctx['listing'] = $wpdb->get_results($wpdb->prepare($sql));
     return $ctx;
 }
@@ -175,9 +178,10 @@ function _process_add() {
                 'license' => $fields['license'],
                 'description' => $fields['description'],
                 'video_width' => $fields['video_width'],
-                'video_height' => $fields['video_height']
+                'video_height' => $fields['video_height'],
+                'status' => $_POST['status']
             ),
-            array('%s', '%s', '%s', '%s', '%d', '%d')
+            array('%s', '%s', '%s', '%s', '%d', '%d', '%d')
         );
 
         /* This info will be needed when adding sources */
@@ -224,6 +228,7 @@ function wpgd_admin_videos_install() {
         author VARCHAR(200) NOT NULL,
         license tinytext NOT NULL,
         description text NOT NULL,
+        status boolean NOT NULL DEFAULT false,
         video_width integer NOT NULL,
         video_height integer NOT NULL,
         UNIQUE KEY id (id)
