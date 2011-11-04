@@ -11,12 +11,13 @@
       </tr>
     </thead>
     <tbody>
+      {% for video in listing %}
       <tr>
         <td>
           Thumb
         </td>
         <td>
-          <strong><a href="#">Saúde</a></strong>
+          <strong><a href="#">{{ video.title }}</a></strong>
 
           <div class="row-actions">
             <span class="edit">
@@ -27,14 +28,12 @@
             </span>
           </div>
         </td>
-        <td class="column-title">
-          O que o Governo do Estado deve fazer para facilitar o acesso e
-          melhorar o atendimento na rede de saúde pública?
-        </td>
+        <td class="column-title">{{ video.description }}</td>
         <td>
           Published
         </td>
       </tr>
+      {% endfor %}
     </tbody>
 
     <tfoot>

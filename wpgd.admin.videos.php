@@ -71,7 +71,7 @@ function wpgd_videos_menu() {
 
 function wpgd_videos_submenu_allvideos() {
     global $renderer;
-    echo $renderer->render('admin/videos/listing.html');
+    echo $renderer->render('admin/videos/listing.html', _process_listing());
 }
 
 
@@ -99,6 +99,17 @@ $video_fields = array(
 $source_fields = array(
     'format', 'url'
 );
+
+
+function _process_listing() {
+    global $wpdb;
+    $ctx = array();
+
+    $videos = $wpdb->prefix . "wpgd_admin_videos";
+    $sql = "SELECT id, title, date, author, description FROM $videos";
+    $ctx['listing'] = $wpdb->get_results($wpdb->prepare($sql));
+    return $ctx;
+}
 
 
 function _process_add() {
