@@ -30,6 +30,8 @@ include("wpgd.thumbs.php");
 include("wpgd.admin.php");
 include("wpgd.admin.videos.php");
 
+register_activation_hook(__FILE__, 'wpgd_admin_videos_install');
+
 wpgd_thumbs_init_sizes();
 
 ?>
