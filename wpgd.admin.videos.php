@@ -19,6 +19,33 @@ include_once('wpgd.templating.php');
 
 $renderer = new WpGdTemplatingRenderer();
 
+
+/* -- Registering some javascripts and styles used by our interface --  */
+
+
+add_action('init', function () {
+    if (is_admin()) {
+        /* javascripts */
+        wp_enqueue_script('jquery');
+        wp_enqueue_script('jquery-ui-core');
+        wp_enqueue_script(
+            'jquery-ui-datepicker',
+            plugins_url('static/js/jquery-ui-datepicker.js', __FILE__));
+        wp_enqueue_script(
+            'wpgd-videos',
+            plugins_url('static/js/videos.js', __FILE__));
+
+        /* stylesheets */
+        wp_enqueue_style(
+            'jquery-ui-datepicker',
+            plugins_url('static/css/jquery-ui-datepicker.css', __FILE__));
+    }
+});
+
+
+/* -- Adding the admin pages we need to this plugin-- */
+
+
 add_action('admin_menu', 'wpgd_videos_menu');
 
 function wpgd_videos_menu() {
