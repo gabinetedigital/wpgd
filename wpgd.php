@@ -1,4 +1,4 @@
-<?php
+<?php /* -*- Mode: php; c-basic-offset:4; -*- */
 /* Copyright (C) 2011  Lincoln de Sousa <lincoln@comum.org>
  *
  * This program is free software: you can redistribute it and/or modify
