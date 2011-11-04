@@ -23,33 +23,44 @@
             <h3>Sources</h3>
 
             <div class="form-field form-required">
-              <div id="col-right" style="width:72%">
-                <div class="col-wrap">
-                  <label>URL</label>
-                  <input type="text" name="urls[]" style="width:80%">
-                  <button class="button">+</button>
-                </div>
-              </div>
+              <ul id="sources">
+                <li class="sourcerow">
+                  <div id="col-right" style="width:72%">
+                    <div class="col-wrap">
+                      <label>URL</label>
+                      <input type="text" name="urls[]" style="width:80%">
+                      <button class="button" onclick="return wpgdVideo.removeSource(this)">
+                        -
+                      </button>
+                    </div>
+                  </div>
 
-              <div id="col-left" style="width:25%">
-                <div class="col-wrap">
-                  <label>Format</label>
-                  <select name="formats[]">
-                    <option value='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
-                      MP4
-                    </option>
-                    <option value='video/webm; codecs="vp8, vorbis"'>
-                      WebM/Vorbis
-                    </option>
-                    <option value='video/ogg; codecs="theora, vorbis"'>
-                      Ogg/Vorbis
-                    </option>
-                    <option value="video/x-flv">
-                      Flash
-                    </option>
-                  </select>
-                </div>
-              </div>
+                  <div id="col-left" style="width:25%">
+                    <div class="col-wrap">
+                      <label>Format</label>
+                      <select name="formats[]">
+                        <option value=""></option>
+                        <option value='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+                          MP4
+                        </option>
+                        <option value='video/webm; codecs="vp8, vorbis"'>
+                          WebM/Vorbis
+                        </option>
+                        <option value='video/ogg; codecs="theora, vorbis"'>
+                          Ogg/Vorbis
+                        </option>
+                        <option value="video/x-flv">
+                          Flash
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                </li> <!-- .sourcerow -->
+              </ul> <!-- #sources -->
+
+              <button class="button" onclick="return wpgdVideo.addSource()">
+                New source
+              </button>
             </div>
           </div> <!-- stuffbox sources -->
 
