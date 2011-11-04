@@ -5,17 +5,26 @@
     <div class="metabox-holder">
       <div id="poststuff">
 
+        {% if errors %}
+        <h3>There were found errors in the following form fields</h3>
+        <ul>
+          {% for i in errors %}
+          <li><strong>{{ i }}</strong></li>
+          {% endfor %}
+        </ul>
+        {% endif %}
+
         <div id="col-right" style="width:49%">
 
           <div class="stuffbox">
             <h3>Video size</h3>
             <div class="form-field form-required">
               <label>Width</label>
-              <input type="text" name="video_width">
+              <input type="text" name="video_width" value="{{ fields.video_width }}">
             </div>
             <div class="form-field form-required">
               <label>Height</label>
-              <input type="text" name="video_height">
+              <input type="text" name="video_height" value="{{ fields.video_height }}">
             </div>
           </div> <!-- stuffbox videosize -->
 
@@ -70,26 +79,30 @@
           <h3>Metadata</h3>
           <div class="form-field form-required">
             <label>Title</label>
-            <input type="text" name="title" id="title">
+            <input type="text" name="title" id="title" value="{{ fields.title }}">
             <p>A user visible text that describes the video</p>
           </div>
 
           <div class="form-field">
             <label>Date</label>
-            <input type="text" name="date" id="date" class="date">
+            <input type="text" name="date" id="date" class="date"
+                   value="{{ fields.date }}">
             <p>This is the date that will be shown to the end user</p>
           </div>
 
           <div class="form-field form-required">
             <label>Author</label>
-            <input type="text" name="author" id="author">
+            <input type="text" name="author" id="author"
+                   value="{{ fields.author }}">
             <p>The author's name (More than one values are accepted)</p>
           </div>
 
           <div class="form-field form-required">
             <label>License</label>
             <select name="license">
-              <option value="cc-by-sa">
+              <option
+                 {% if fields.license == 'cc-by-sa' %}selected="selected"{% endif %}
+                 value="cc-by-sa">
                 Creative Commons - Atribuição - Partilha nos Mesmos
                 Termos 3.0 Não Adaptada.
               </option>
@@ -98,7 +111,7 @@
 
           <div class="form-field form-required">
             <label>Description</label>
-            <textarea></textarea>
+            <textarea name="description">{{ fields.description }}</textarea>
             <p>
               Another user visible text, but with more details about the
               video.

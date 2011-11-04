@@ -16,6 +16,7 @@
  */
 
 include_once('wpgd.templating.php');
+include_once('inc.validation.php');
 
 $renderer = new WpGdTemplatingRenderer();
 
@@ -65,6 +66,9 @@ function wpgd_videos_menu() {
 }
 
 
+/* -- Views that renders the templates being used in this app -- */
+
+
 function wpgd_videos_submenu_allvideos() {
     global $renderer;
     echo $renderer->render('admin/videos/listing.html');
@@ -73,7 +77,7 @@ function wpgd_videos_submenu_allvideos() {
 
 function wpgd_videos_submenu_add() {
     global $renderer;
-    echo $renderer->render('admin/videos/add.html');
+    echo $renderer->render('admin/videos/add.html', _process_add());
 }
 
 
@@ -86,9 +90,42 @@ function wpgd_videos_submenu_home() {
 /* -- Functions that process the requests of the above views -- */
 
 
+$video_fields = array(
+    'title', 'date', 'author', 'license', 'description',
+    'video_width', 'video_height'
+);
+
+
 function _process_add() {
+    global $video_fields;
+
     $ctx = array();
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+        global $wpdb;
+        $videos = $wpdb->prefix . "wpgd_admin_videos";
+        $sources = $wpdb->prefix . "wpgd_admin_videos_sources";
+
+        try {
+            $fields = _validate_post($video_fields);
+        } catch (ValidationException $exc) {
+            return array(
+                'errors' => $exc->getErrors(),
+                'fields' => $_POST
+            );
+        }
+
+        $wpdb->insert(
+            $videos,
+            array(
+                'title' => $_POST['title'],
+                'author' => $_POST['author'],
+                'license' => $_POST['license'],
+                'description' => $_POST['description'],
+                'video_width' => $_POST['video_width'],
+                'video_height' => $_POST['video_height']
+            ),
+            array('%s', '%s', '%s', '%s', '%d', '%d')
+        );
     }
     return $ctx;
 }
