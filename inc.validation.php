@@ -32,12 +32,16 @@ class ValidationException extends Exception {
 /* -- Generic validation function -- */
 
 
-function _validate_post($fields) {
+function _validate_array($fields, $array=null) {
     $clear = array();
     $errors = array();
 
+    if ($array === null) {
+        $array = $_POST;
+    }
+
     foreach ($fields as $item) {
-        $clear[$item] = trim($_POST[$item]);
+        $clear[$item] = trim($array[$item]);
         if ($clear[$item] === '') {
             $errors[] = $item;
         }

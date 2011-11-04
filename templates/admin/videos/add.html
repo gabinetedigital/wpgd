@@ -32,12 +32,78 @@
             <h3>Sources</h3>
 
             <div class="form-field form-required">
+              {% if source_fields|length == 0 %}
+              <p>
+                Please, inform at least one video source before adding a
+                new video
+              </p>
+              {% endif %}
+              {% if source_incomplete|length > 0 %}
+              <p>
+                Please fix the errors present in one of your sources
+              </p>
+              {% endif %}
+
               <ul id="sources">
+                {% for source in source_fields %}
                 <li class="sourcerow">
                   <div id="col-right" style="width:72%">
                     <div class="col-wrap">
                       <label>URL</label>
-                      <input type="text" name="urls[]" style="width:80%">
+                      <input
+                         type="text" name="urls[]" style="width:80%"
+                         value="{{ source.url }}">
+                      <button class="button" onclick="return wpgdVideo.removeSource(this)">
+                        -
+                      </button>
+                    </div>
+                  </div>
+
+                  <div id="col-left" style="width:25%">
+                    <div class="col-wrap">
+                      <label>Format</label>
+                      <select name="formats[]">
+                        <option value=""></option>
+                        <option
+                           {% if 'video/mp4' in source.format %}
+                           selected="selected"
+                           {% endif %}
+                           value='video/mp4; codecs="avc1.42E01E, mp4a.40.2"'>
+                          MP4
+                        </option>
+                        <option
+                           {% if 'video/webm' in source.format %}
+                           selected="selected"
+                           {% endif %}
+                           value='video/webm; codecs="vp8, vorbis"'>
+                          WebM/Vorbis
+                        </option>
+                        <option
+                           {% if 'video/ogg' in source.format %}
+                           selected="selected"
+                           {% endif %}
+                           value='video/ogg; codecs="theora, vorbis"'>
+                          Ogg/Vorbis
+                        </option>
+                        <option
+                           {% if 'video/x-flv' in source.format %}
+                           selected="selected"
+                           {% endif %}
+                           value="video/x-flv">
+                          Flash
+                        </option>
+                      </select>
+                    </div>
+                  </div>
+                </li> <!-- .sourcerow -->
+                {% else %}
+                <li class="sourcerow">
+                  <div id="col-right" style="width:72%">
+                    <div class="col-wrap">
+                      <label>URL</label>
+                      <input
+                         type="text" name="urls[]" style="width:80%"
+                         value="{{ source.url }}">
                       <button class="button" onclick="return wpgdVideo.removeSource(this)">
                         -
                       </button>
@@ -65,6 +131,8 @@
                     </div>
                   </div>
                 </li> <!-- .sourcerow -->
+
+                {% endfor %}
               </ul> <!-- #sources -->
 
               <button class="button" onclick="return wpgdVideo.addSource()">
@@ -122,7 +190,7 @@
 
         <p class="submit">
           <button class="button">
-            Add new video
+            Add video
           </button>
         </p>
 

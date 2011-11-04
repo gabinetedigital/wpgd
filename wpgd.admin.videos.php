@@ -96,36 +96,94 @@ $video_fields = array(
 );
 
 
+$source_fields = array(
+    'format', 'url'
+);
+
+
 function _process_add() {
     global $video_fields;
+    global $source_fields;
 
     $ctx = array();
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         global $wpdb;
-        $videos = $wpdb->prefix . "wpgd_admin_videos";
-        $sources = $wpdb->prefix . "wpgd_admin_videos_sources";
+        $videos_table = $wpdb->prefix . "wpgd_admin_videos";
+        $sources_table = $wpdb->prefix . "wpgd_admin_videos_sources";
 
+        /* Validating the source received from the form */
+        $sources = array();
+        $incomplete_sources = array();
+
+        for ($i = 0; $i < sizeof($_POST['formats']); $i++) {
+            /* Form that will be validated */
+            $source = array(
+                'format' => trim($_POST['formats'][$i]),
+                'url' => trim($_POST['urls'][$i])
+            );
+
+            if ($source['format'] !== '' && $source['url'] !== '') {
+                /* Both values are ok, let's rock! */
+                $sources[] = $source;
+            } else if ($source['format'] === '' && $source['url'] === '') {
+                /* There's nothing to be done here, the user didn't
+                   fill any of the requested fields */
+                continue;
+            } else {
+                /* The user forgot to fill one of the fields, let's give
+                   him/her another chance to do it */
+                $incomplete_sources[] = $source;
+            }
+        }
+
+        /* Validating the rest of the form */
         try {
-            $fields = _validate_post($video_fields);
+            $fields = _validate_array($video_fields);
+
+            /* Maybe it's everything ok with the normal fields, but
+               let's find out what happened in the source list
+               validation */
+            if (sizeof($sources) === 0) {
+                throw new ValidationException(array());
+            }
         } catch (ValidationException $exc) {
             return array(
                 'errors' => $exc->getErrors(),
-                'fields' => $_POST
+                'fields' => $_POST,
+                'source_fields' => array_merge($sources, $incomplete_sources),
+                'source_incomplete' => $incomplete_sources
             );
         }
 
+        /* Finally, inserting the video */
         $wpdb->insert(
-            $videos,
+            $videos_table,
             array(
-                'title' => $_POST['title'],
-                'author' => $_POST['author'],
-                'license' => $_POST['license'],
-                'description' => $_POST['description'],
-                'video_width' => $_POST['video_width'],
-                'video_height' => $_POST['video_height']
+                'title' => $fields['title'],
+                'author' => $fields['author'],
+                'license' => $fields['license'],
+                'description' => $fields['description'],
+                'video_width' => $fields['video_width'],
+                'video_height' => $fields['video_height']
             ),
             array('%s', '%s', '%s', '%s', '%d', '%d')
         );
+
+        /* This info will be needed when adding sources */
+        $video_id = $wpdb->insert_id;
+
+        /* Saving video `sources' */
+        foreach ($sources as $s) {
+            /* Form that will be validated */
+            $wpdb->insert(
+                $sources_table,
+                array(
+                    'video_id' => $video_id,
+                    'format' => $s['format'],
+                    'url' => $s['url']
+                ),
+                array('%d', '%s', '%s'));
+        }
     }
     return $ctx;
 }
