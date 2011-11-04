@@ -6,12 +6,14 @@
       <div id="poststuff">
 
         {% if errors %}
-        <h3>There were found errors in the following form fields</h3>
-        <ul>
-          {% for i in errors %}
-          <li><strong>{{ i }}</strong></li>
-          {% endfor %}
-        </ul>
+        <h4>There were found errors in the following form fields</h4>
+        <div class="form-field">
+          <ul>
+            {% for i in errors %}
+            <li>The field <strong>"{{ i }}"</strong> is empty</li>
+            {% endfor %}
+          </ul>
+        </div>
         {% endif %}
 
         <div id="col-right" style="width:49%">
@@ -27,6 +29,14 @@
               <input type="text" name="video_height" value="{{ fields.video_height }}">
             </div>
           </div> <!-- stuffbox videosize -->
+
+          <div class="stuffbox">
+            <h3>Thumbnail</h3>
+            <div class="form-field form-required">
+              <input type="text" name="thumbnail" value="{{ fields.thumbnail }}">
+              <p>The thumbnail url</p>
+            </div>
+          </div>
 
           <div class="stuffbox">
             <h3>Sources</h3>

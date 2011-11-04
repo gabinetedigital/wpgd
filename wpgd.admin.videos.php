@@ -92,7 +92,7 @@ function wpgd_videos_submenu_home() {
 
 $video_fields = array(
     'title', 'date', 'author', 'license', 'description',
-    'video_width', 'video_height'
+    'video_width', 'video_height', 'thumbnail'
 );
 
 
@@ -108,7 +108,7 @@ function _process_listing() {
     $videos = $wpdb->prefix . "wpgd_admin_videos";
     $sql = "
         SELECT
-            id, title, date, author, description, status
+            id, title, date, author, description, thumbnail, status
         FROM $videos";
     $ctx['listing'] = $wpdb->get_results($wpdb->prepare($sql));
     return $ctx;
@@ -177,11 +177,12 @@ function _process_add() {
                 'author' => $fields['author'],
                 'license' => $fields['license'],
                 'description' => $fields['description'],
+                'thumbnail' => $fields['thumbnail'],
                 'video_width' => $fields['video_width'],
                 'video_height' => $fields['video_height'],
-                'status' => $_POST['status']
+                'status' => isset($_POST['status']) ? '1' : '0'
             ),
-            array('%s', '%s', '%s', '%s', '%d', '%d', '%d')
+            array('%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d')
         );
 
         /* This info will be needed when adding sources */
@@ -229,6 +230,7 @@ function wpgd_admin_videos_install() {
         license tinytext NOT NULL,
         description text NOT NULL,
         status boolean NOT NULL DEFAULT false,
+        thumbnail VARCHAR(256) NOT NULL,
         video_width integer NOT NULL,
         video_height integer NOT NULL,
         UNIQUE KEY id (id)
