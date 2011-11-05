@@ -17,6 +17,7 @@
 
 include_once('wpgd.templating.php');
 include_once('inc.validation.php');
+include_once('inc.servestatic.php');
 include_once('inc.videos.php');
 
 $renderer = new WpGdTemplatingRenderer();
@@ -41,6 +42,27 @@ add_action('init', function () {
         wp_enqueue_style(
             'jquery-ui-datepicker',
             plugins_url('static/css/jquery-ui-datepicker.css', __FILE__));
+    }
+
+    /* -- Registering custom pages -- */
+
+    if (isset($_GET['wpgd/video/embedjs'])) {
+        echo wpgd_servestatic_servejs(array(
+            'videre/js/avl.js',
+            'videre/js/player.js'
+        ));
+        die();
+    }
+
+    if (isset($_GET['wpgd/video/embedjs-deps'])) {
+        echo wpgd_servestatic_servejs(array(
+            'videre/js/l/jquery.js',
+            'videre/js/l/flowplayer.js',
+            'videre/js/l/video.js',
+            'videre/js/avl.js',
+            'videre/js/player.js',
+        ));
+        die();
     }
 });
 
