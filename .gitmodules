@@ -1,0 +1,3 @@
+[submodule "static/videre"]
+	path = static/videre
+	url = http://git.videolivre.org.br/videre.git
