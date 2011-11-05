@@ -8,13 +8,16 @@
     home</em> button.
   </p>
 
-  <div>
-    <img src="">
-    <h3>Entrega Prêmio ARede</h3>
-    <p>
-      Nulla facilisi. Cras neque elit, dignissim sed molestie vel,
-      elementum eu enim. Vestibulum vitae justo et metus vulputate
-      imperdiet.
-    </p>
-  </div>
+  <ul>
+    {% for video in listing %}
+    <li>
+      <img src="{{ video.thumbnail }}"
+           style="float:left; margin-right:20px;">
+      <h3>{{ video.title }}</h3>
+      <p>{{ video.description }}</p>
+      <a href="#">Remove from home</a>
+      <br style="clear:both; margin-top:20px;">
+    </li>
+    {% endfor %}
+  </ul>
 </div>

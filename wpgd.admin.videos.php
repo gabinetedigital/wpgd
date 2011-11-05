@@ -134,7 +134,7 @@ function wpgd_videos_submenu_edit() {
 
 function wpgd_videos_submenu_home() {
     global $renderer;
-    echo $renderer->render('admin/videos/home.html');
+    echo $renderer->render('admin/videos/home.html', _process_home());
 }
 
 
@@ -153,15 +153,15 @@ $source_fields = array(
 
 
 function _process_listing() {
-    global $wpdb;
     $ctx = array();
+    $ctx['listing'] = wpgd_videos_get_videos(null, "date DESC");
+    return $ctx;
+}
 
-    $videos = $wpdb->prefix . "wpgd_admin_videos";
-    $sql = "
-        SELECT
-            id, title, date, author, description, thumbnail, status
-        FROM $videos ORDER BY date DESC";
-    $ctx['listing'] = $wpdb->get_results($wpdb->prepare($sql));
+
+function _process_home() {
+    $ctx = array();
+    $ctx['listing'] = wpgd_videos_get_videos("highlight=true", "date DESC");
     return $ctx;
 }
 
@@ -213,15 +213,16 @@ function _process_edit() {
                 'thumbnail' => $fields['thumbnail'],
                 'video_width' => $fields['video_width'],
                 'video_height' => $fields['video_height'],
-                'status' => isset($_POST['status'])
+                'status' => isset($_POST['status']),
+                'highlight' => isset($_POST['status'])
             ),
             array('id' => $video_id),
-            array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d'),
+            array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d'),
             array('%d')
         );
         $ctx['fields'] = $fields;
         $ctx['fields']['status'] = isset($_POST['status']);
-
+        $ctx['fields']['highlight'] = isset($_POST['highlight']);
 
         /* Updating sources */
         $handled_sources = array();
@@ -375,9 +376,10 @@ function _process_add() {
             'thumbnail' => $fields['thumbnail'],
             'video_width' => $fields['video_width'],
             'video_height' => $fields['video_height'],
-            'status' => isset($_POST['status']) ? '1' : '0'
+            'status' => isset($_POST['status']),
+            'highlight' => isset($_POST['status'])
         ),
-        array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d')
+        array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d')
     );
 
     /* This info will be needed when adding sources */
@@ -424,6 +426,7 @@ function wpgd_admin_videos_install() {
         license tinytext NOT NULL,
         description text NOT NULL,
         status boolean NOT NULL DEFAULT false,
+        highlight boolean NOT NULL DEFAULT false,
         thumbnail VARCHAR(256) NOT NULL,
         video_width integer NOT NULL,
         video_height integer NOT NULL,

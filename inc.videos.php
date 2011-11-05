@@ -15,6 +15,23 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+
+function wpgd_videos_get_videos($where=null, $orderby=null) {
+    global $wpdb;
+    $videos = $wpdb->prefix . "wpgd_admin_videos";
+    $sql = "
+      SELECT
+        id, title, date, author, description, thumbnail,
+        status, highlight
+      FROM $videos ";
+    if (isset($where))
+        $sql .= "WHERE $where ";
+    if (isset($orderby))
+        $sql .= "ORDER BY $orderby ";
+    return $wpdb->get_results($wpdb->prepare($sql));
+}
+
+
 function wpgd_videos_get_video($vid) {
     global $wpdb;
     $table = $wpdb->prefix . "wpgd_admin_videos";
