@@ -17,6 +17,7 @@
 
 include_once('wpgd.templating.php');
 include_once('inc.validation.php');
+include_once('inc.videos.php');
 
 $renderer = new WpGdTemplatingRenderer();
 
@@ -131,13 +132,7 @@ function _process_edit() {
     $ctx = array('edit' => true);
 
     /* Getting the video attributes */
-    $sql = "
-        SELECT
-            id, title, date, author, description, thumbnail,
-            status, video_width, video_height
-        FROM $videos_table
-        WHERE id = " . $video_id;
-    $ctx['fields'] = $wpdb->get_row($wpdb->prepare($sql), ARRAY_A);
+    $ctx['fields'] = wpgd_videos_get_video($video_id);
 
     /* Formatting date as the user expects to see */
     $date = $ctx['fields']['date'];
@@ -145,10 +140,8 @@ function _process_edit() {
         "Y-m-d H:i:s", $date), 'd/m/Y');
 
     /* Listing the sources */
-    $sql = "
-        SELECT id, format, url FROM $sources_table
-        WHERE video_id = " . $video_id;
-    $ctx['source_fields'] = $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+    $ctx['source_fields'] = wpgd_videos_get_sources($video_id);
+
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         /* Validating the rest of the form */
