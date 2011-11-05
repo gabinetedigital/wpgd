@@ -16,7 +16,7 @@
  */
 
 
-function wpgd_videos_get_videos($where=null, $orderby=null) {
+function wpgd_videos_get_videos($where=null, $orderby=null, $limit=null) {
     global $wpdb;
     $videos = $wpdb->prefix . "wpgd_admin_videos";
     $sql = "
@@ -28,7 +28,14 @@ function wpgd_videos_get_videos($where=null, $orderby=null) {
         $sql .= "WHERE $where ";
     if (isset($orderby))
         $sql .= "ORDER BY $orderby ";
+    if (isset($limit))
+        $sql .= "LIMIT $limit";
     return $wpdb->get_results($wpdb->prepare($sql));
+}
+
+
+function wpgd_videos_get_highlighted_videos($limit=null) {
+    return wpgd_videos_get_videos("highlight=true", "date DESC", $limit);
 }
 
 

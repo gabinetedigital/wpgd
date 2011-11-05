@@ -161,7 +161,7 @@ function _process_listing() {
 
 function _process_home() {
     $ctx = array();
-    $ctx['listing'] = wpgd_videos_get_videos("highlight=true", "date DESC");
+    $ctx['listing'] = wpgd_videos_get_highlighted_videos();
     return $ctx;
 }
 
