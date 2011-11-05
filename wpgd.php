@@ -29,6 +29,7 @@ License: AGPL3
 include("wpgd.thumbs.php");
 include("wpgd.admin.php");
 include("wpgd.admin.videos.php");
+include("wpgd.xmlrpc.php");
 
 register_activation_hook(__FILE__, 'wpgd_admin_videos_install');
 
