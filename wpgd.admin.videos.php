@@ -185,6 +185,7 @@ function _process_edit() {
             array('%d')
         );
         $ctx['fields'] = $fields;
+        $ctx['fields']['status'] = isset($_POST['status']);
     }
 
     $ctx['fields']['id'] = $video_id;
