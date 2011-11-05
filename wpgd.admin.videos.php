@@ -186,6 +186,50 @@ function _process_edit() {
         );
         $ctx['fields'] = $fields;
         $ctx['fields']['status'] = isset($_POST['status']);
+
+
+        /* Updating sources */
+        $handled_sources = array();
+
+        for ($i = 0; $i < sizeof($sources); $i++) {
+            $s = $sources[$i];
+
+            if (!empty($s['id'])) {
+                /* Update existing sources */
+                $wpdb->update(
+                    $sources_table,
+                    array('format' => $s['format'], 'url' => $s['url']),
+                    array('id' => $s['id']),
+                    array('%s', '%s'),
+                    array('%d')
+                );
+                $handled_sources[] = $s['id'];
+            } else {
+                /* Dealing with the new ones */
+                $wpdb->insert($sources_table,
+                    array(
+                        'video_id' => $video_id,
+                        'format' => $s['format'],
+                        'url' => $s['url']
+                    ),
+                    array('%d', '%s', '%s')
+                );
+                $sources[$i]['id'] = $wpdb->insert_id;
+                $handled_sources[] = $sources[$i]['id'];
+            }
+        }
+        /* Dealing with the removed sources */
+        $excluded = implode(',', $handled_sources);
+        $excluded_ids = $wpdb->get_col($wpdb->prepare(
+            "SELECT id FROM $sources_table WHERE id not in ($excluded)
+             AND video_id = $video_id"));
+        if ($excluded_ids) {
+            $excluded = join($excluded_ids, ',');
+            $wpdb->query($wpdb->prepare(
+                "DELETE FROM $sources_table WHERE id in ($excluded)"));
+        }
+
+        $ctx['source_fields'] = $sources;
     }
 
     $ctx['fields']['id'] = $video_id;
@@ -203,6 +247,11 @@ function __validate_sources() {
             'format' => trim($_POST['formats'][$i]),
             'url' => trim($_POST['urls'][$i])
         );
+
+        /* In case of edit */
+        if (isset($_POST['sids'])) {
+            $source['id'] = trim($_POST['sids'][$i]);
+        }
 
         if ($source['format'] !== '' && $source['url'] !== '') {
             /* Both values are ok, let's rock! */

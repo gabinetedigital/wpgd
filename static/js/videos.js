@@ -27,6 +27,7 @@ var wpgdVideo = (function ($) {
         addSource: function () {
             var $clone = $($('.sourcerow')[0]).clone();
             $clone.find('input[type=text]').val('');
+            $clone.find('input[type=hidden]').val('');
             $clone.find('select').val('');
             $clone.appendTo('#sources');
             return false;

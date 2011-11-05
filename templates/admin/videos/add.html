@@ -67,6 +67,7 @@
               <ul id="sources">
                 {% for source in source_fields %}
                 <li class="sourcerow">
+                  <input type="hidden" name="sids[]" value="{{ source.id }}">
                   <div id="col-right" style="width:72%">
                     <div class="col-wrap">
                       <label>URL</label>
