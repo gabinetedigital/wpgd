@@ -137,7 +137,7 @@ function _process_edit() {
             status, video_width, video_height
         FROM $videos_table
         WHERE id = " . $video_id;
-    $ctx['fields'] = $wpdb->get_row($wpdb->prepare($sql));
+    $ctx['fields'] = $wpdb->get_row($wpdb->prepare($sql), ARRAY_A);
 
     /* Listing the sources */
     $sql = "
@@ -156,8 +156,27 @@ function _process_edit() {
             $ctx['fields']['id'] = $video_id;
             return $ctx;
         }
+
+        $wpdb->update(
+            $videos_table,
+            array(
+                'title' => $fields['title'],
+                'author' => $fields['author'],
+                'license' => $fields['license'],
+                'description' => $fields['description'],
+                'thumbnail' => $fields['thumbnail'],
+                'video_width' => $fields['video_width'],
+                'video_height' => $fields['video_height'],
+                'status' => isset($_POST['status'])
+            ),
+            array('id' => $video_id),
+            array('%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d'),
+            array('%d')
+        );
+        $ctx['fields'] = $fields;
     }
 
+    $ctx['fields']['id'] = $video_id;
     return $ctx;
 }
 
