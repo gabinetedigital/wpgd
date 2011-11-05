@@ -4,10 +4,10 @@
   <table class="wp-list-table widefat fixed audiences" cellspacing="0">
     <thead>
       <tr>
-        <th>Thumbnail</th>
+        <th style="width:10%">Thumbnail</th>
         <th>Title</th>
         <th>Summary</th>
-        <th>Status</th>
+        <th class="column-date">Date</th>
       </tr>
     </thead>
     <tbody>
@@ -15,7 +15,8 @@
       <tr>
         <td>
           <a href="admin.php?page=gd-videos-edit&video_id={{ video.id }}">
-            <img alt="{{ video.title }}" src="{{ video.thumbnail }}">
+            <img alt="{{ video.title }}" src="{{ video.thumbnail }}"
+                 style="width:100px;">
           </a>
         </td>
         <td>
@@ -36,7 +37,8 @@
           </div>
         </td>
         <td class="column-title">{{ video.description }}</td>
-        <td>
+        <td class="date column-date">
+          <abbr>{{ video.date|date("d/m/Y") }}</abbr><br>
           {% if not video.status %}Not{% endif %} Published
         </td>
       </tr>
@@ -48,7 +50,7 @@
         <th classs="manage-column sortable desc" scope="col">Thumbnail</th>
         <th classs="manage-column sortable desc" scope="col">Title</th>
         <th classs="manage-column sortable asc" scope="col">Description</th>
-        <th classs="manage-column sortable desc" scope="col">Status</th>
+        <th classs="manage-column sortable desc" scope="col">Date</th>
       </tr>
     </tfoot>
   </table>

@@ -117,7 +117,7 @@ function _process_listing() {
     $sql = "
         SELECT
             id, title, date, author, description, thumbnail, status
-        FROM $videos";
+        FROM $videos ORDER BY date DESC";
     $ctx['listing'] = $wpdb->get_results($wpdb->prepare($sql));
     return $ctx;
 }
