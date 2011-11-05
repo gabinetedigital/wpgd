@@ -17,7 +17,6 @@
 
 
 function wpgd_servestatic_servejs($list) {
-    header('Content-Type: application/x-javascript; charset=UTF-8');
     $content = array();
     foreach ($list as $l) {
         $base = dirname(__FILE__) . '/static/';

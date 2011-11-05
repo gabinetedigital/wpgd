@@ -61,27 +61,28 @@ add_action('init', function () {
     }
 
     if (isset($_GET['wpgd/video/embedjs'])) {
-        echo wpgd_servestatic_servejs(array(
-            'videre/js/avl.js',
-            'videre/js/player.js',
-            'js/embed.js'
-        ));
-        die();
-    }
-
-    if (isset($_GET['wpgd/video/embedjs-deps'])) {
         $sources = home_url() . '?wpgd/video/sources';
         $static = plugins_url('static/videre', __FILE__);
-        echo "var SOURCES_URL = '$sources';\n";
-        echo "var STATIC_URL = '$static';\n";
-        echo wpgd_servestatic_servejs(array(
-            'videre/js/l/jquery.js',
+        $full = isset($_GET['full']);
+        $deps = array(
             'videre/js/l/flowplayer.js',
             'videre/js/l/video.js',
             'videre/js/avl.js',
             'videre/js/player.js',
-            'js/embed.js'
-        ));
+        );
+
+        /* User requested full dependency list, let's include jquery and
+           an entry point script that calls the `avl.player()' method */
+        if ($full) {
+            array_unshift($deps, 'videre/js/l/jquery.js');
+            array_push($deps, 'js/embed.js');
+        }
+
+        /* Rendering the javascript content in the response */
+        header('Content-Type: application/x-javascript; charset=UTF-8');
+        echo "var SOURCES_URL = '$sources';\n";
+        echo "var STATIC_URL = '$static';\n";
+        echo wpgd_servestatic_servejs($deps);
         die();
     }
 });
