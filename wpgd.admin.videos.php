@@ -139,6 +139,11 @@ function _process_edit() {
         WHERE id = " . $video_id;
     $ctx['fields'] = $wpdb->get_row($wpdb->prepare($sql), ARRAY_A);
 
+    /* Formatting date as the user expects to see */
+    $date = $ctx['fields']['date'];
+    $ctx['fields']['date'] = date_format(date_create_from_format(
+        "Y-m-d H:i:s", $date), 'd/m/Y');
+
     /* Listing the sources */
     $sql = "
         SELECT id, format, url FROM $sources_table
@@ -157,10 +162,16 @@ function _process_edit() {
             return $ctx;
         }
 
+        /* Date field handling */
+        /* FIXME: hardcoded date format */
+        $date = date_format(date_create_from_format(
+            "d/m/Y", $fields['date']), 'Y-m-d H:i:s');
+
         $wpdb->update(
             $videos_table,
             array(
                 'title' => $fields['title'],
+                'date' => $date,
                 'author' => $fields['author'],
                 'license' => $fields['license'],
                 'description' => $fields['description'],
@@ -170,7 +181,7 @@ function _process_edit() {
                 'status' => isset($_POST['status'])
             ),
             array('id' => $video_id),
-            array('%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d'),
+            array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d'),
             array('%d')
         );
         $ctx['fields'] = $fields;
@@ -262,11 +273,17 @@ function _process_add() {
         return $exc->getErrors();
     }
 
+    /* Date field handling */
+    /* FIXME: hardcoded date format */
+    $date = date_format(date_create_from_format(
+        "d/m/Y", $fields['date']), 'Y-m-d H:i:s');
+
     /* Finally, inserting the video */
     $wpdb->insert(
         $videos_table,
         array(
             'title' => $fields['title'],
+            'date' => $date,
             'author' => $fields['author'],
             'license' => $fields['license'],
             'description' => $fields['description'],
@@ -275,7 +292,7 @@ function _process_add() {
             'video_height' => $fields['video_height'],
             'status' => isset($_POST['status']) ? '1' : '0'
         ),
-        array('%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d')
+        array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d')
     );
 
     /* This info will be needed when adding sources */

@@ -18,7 +18,8 @@
 
 var wpgdVideo = (function ($) {
     $(function() {
-        $('.date').datepicker();
+        /* FIXME: hardcoded date format */
+        $('.date').datepicker({ dateFormat: 'dd/mm/yy' });
     });
 
     function Video() { }
