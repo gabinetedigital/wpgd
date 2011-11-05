@@ -27,6 +27,8 @@ $renderer = new WpGdTemplatingRenderer();
 
 
 add_action('init', function () {
+    global $renderer;
+
     if (is_admin()) {
         /* javascripts */
         wp_enqueue_script('jquery');
@@ -46,21 +48,39 @@ add_action('init', function () {
 
     /* -- Registering custom pages -- */
 
+    if (isset($_GET['wpgd/video/sources'])
+        && isset($_GET['vid'])
+        && isset($_GET['callback'])) {
+        $ctx = array('sources' => wpgd_videos_get_sources($_GET['vid']));
+        $ctx['callback'] = $_GET['callback'];
+
+        /* Rendering a JSONP call with the sources */
+        header('Content-Type: application/x-javascript; charset=UTF-8');
+        echo $renderer->render('admin/videos/embed.js', $ctx);
+        die();
+    }
+
     if (isset($_GET['wpgd/video/embedjs'])) {
         echo wpgd_servestatic_servejs(array(
             'videre/js/avl.js',
-            'videre/js/player.js'
+            'videre/js/player.js',
+            'js/embed.js'
         ));
         die();
     }
 
     if (isset($_GET['wpgd/video/embedjs-deps'])) {
+        $sources = home_url() . '?wpgd/video/sources';
+        $static = plugins_url('static/videre', __FILE__);
+        echo "var SOURCES_URL = '$sources';\n";
+        echo "var STATIC_URL = '$static';\n";
         echo wpgd_servestatic_servejs(array(
             'videre/js/l/jquery.js',
             'videre/js/l/flowplayer.js',
             'videre/js/l/video.js',
             'videre/js/avl.js',
             'videre/js/player.js',
+            'js/embed.js'
         ));
         die();
     }
