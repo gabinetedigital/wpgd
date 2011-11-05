@@ -14,7 +14,9 @@
       {% for video in listing %}
       <tr>
         <td>
-          <img alt="{{ video.title }}" src="{{ video.thumbnail }}">
+          <a href="admin.php?page=gd-videos-edit&video_id={{ video.id }}">
+            <img alt="{{ video.title }}" src="{{ video.thumbnail }}">
+          </a>
         </td>
         <td>
           <strong>
