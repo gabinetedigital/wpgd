@@ -23,7 +23,7 @@ function wpgd_thumbs_init_sizes() {
     if (function_exists('add_image_size')) {
         // Adding the image size present in the `slideshow' box also in
         // the index page.
-        add_image_size('slideshow', 325, 220, true);
+        add_image_size('slideshow', 325, 180, true);
 
         // Here we set the default post thumbnail dimensions, that
         // is the size that we use in the `news' box present in the
