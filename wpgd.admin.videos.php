@@ -402,6 +402,19 @@ function _process_add() {
 }
 
 
+/* -- Shortcode API that provides the [gdvideo] command -- */
+
+
+function wpgd_admin_videos_shortcode($atts){
+    extract(shortcode_atts( array(
+        'id' => 'something',
+     ), $atts));
+
+    return "<gd:video id=\"{$id}\">";
+}
+add_shortcode('gdvideo', 'wpgd_admin_videos_shortcode');
+
+
 /* -- Installation functions - They care about the database setup of our
       sub-plugin -- */
 
