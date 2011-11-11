@@ -1,5 +1,5 @@
 <?php /* -*- Mode: php; c-basic-offset:4; -*- */
-/* Copyright (C) 2011  Lincoln de Sousa <lincoln@comum.org>
+/* Copyright (C) 2011  Governo do Estado do Rio Grande do Sul
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU Affero General Public License as published by
@@ -15,25 +15,28 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-/*
-Plugin Name: WpGD
-Plugin URI: http://trac.gabinetedigital.rs.gov.br
-Description: Interaction of the gd tools with wordpress
-Version: 0.1.0
-Author: Lincoln de Sousa <lincoln@gg.rs.gov.br>
-Author URI: http://gabinetedigital.rs.gov.br
-License: AGPL3
-*/
+
+function wpgd_govp_get_contribs($where=null, $orderby=null, $limit=null) {
+    global $wpdb;
+    $sql = "
+      SELECT id, title, content, creation_date, theme
+      FROM contrib ";
+    if (isset($where))
+        $sql .= "WHERE $where ";
+    if (isset($orderby))
+        $sql .= "ORDER BY $orderby ";
+    if (isset($limit))
+        $sql .= "LIMIT $limit";
+    return $wpdb->get_results($wpdb->prepare($sql));
+}
 
 
-include("wpgd.thumbs.php");
-include("wpgd.admin.php");
-include("wpgd.admin.govp.php");
-include("wpgd.admin.videos.php");
-include("wpgd.xmlrpc.php");
-
-register_activation_hook(__FILE__, 'wpgd_admin_videos_install');
-
-wpgd_thumbs_init_sizes();
+function wpgd_govp_get_contrib_count($where=null) {
+    global $wpdb;
+    $sql = "SELECT count(id) FROM contrib ";
+    if (isset($where))
+        $sql .= "WHERE $where ";
+    return $wpdb->get_var($wpdb->prepare($sql));
+}
 
 ?>
