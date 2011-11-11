@@ -410,7 +410,7 @@ function wpgd_admin_videos_shortcode($atts){
         'id' => 'something',
      ), $atts));
 
-    return "<gd:video id=\"{$id}\">";
+    return "<gd:video id=\"{$id}\"></gd:video>";
 }
 add_shortcode('gdvideo', 'wpgd_admin_videos_shortcode');
 
