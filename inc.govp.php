@@ -19,8 +19,8 @@
 function wpgd_govp_get_contribs($where=null, $orderby=null, $limit=null) {
     global $wpdb;
     $sql = "
-      SELECT c.id, c.title, c.content, c.creation_date, c.theme,".
-      " u.display_name ".
+      SELECT c.id, c.title, c.content, c.creation_date, c.theme, c.original, ".
+      " c.status, u.display_name ".
       " FROM contrib c, wp_users u ".
       " WHERE c.user_id=u.ID ";
     if (isset($where))
@@ -30,6 +30,16 @@ function wpgd_govp_get_contribs($where=null, $orderby=null, $limit=null) {
     if (isset($limit))
         $sql .= "LIMIT $limit";
     return $wpdb->get_results($wpdb->prepare($sql));
+}
+
+function wpgd_govp_get_contrib($id) {
+    global $wpdb;
+    $sql = "
+      SELECT c.id, c.title, c.content, c.creation_date, c.theme, c.original, ".
+      " c.status, u.display_name ".
+      " FROM contrib c, wp_users u ".
+      " WHERE c.user_id=u.ID AND c.id=%d";
+    return array_pop($wpdb->get_results($wpdb->prepare($sql,array($id))));
 }
 
 

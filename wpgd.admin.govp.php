@@ -18,6 +18,22 @@
 include_once('wpgd.templating.php');
 include_once('inc.govp.php');
 
+add_action('init', function () {
+    if (is_admin()) {
+        wp_enqueue_script('jquery');
+        wp_enqueue_script('jquery-ui-core');
+        wp_enqueue_script(
+            'wpgd-contrib',
+            plugins_url('static/js/contrib.js', __FILE__));
+
+        wp_enqueue_style(
+            'wpgd-contrib-css',
+            plugins_url('static/css/contrib.css', __FILE__));
+    }
+  }
+);
+
+
 add_action('admin_menu', function () {
     $menupage = __FILE__;
 
@@ -35,4 +51,35 @@ function wpgd_govp_main() {
     echo $renderer->render('admin/govp/listing.html', $ctx);
 }
 
+function wpgd_update_contrib() {
+    //backup the original author's contribution before updating it
+
+    global $wpdb;
+    $org = wpgd_govp_get_contrib($_POST['data']['id']);
+
+    switch ($_POST['data']['field']) {
+    case 'content':
+        if (strlen($org->original) == 0) {
+            $wpdb->update("contrib",
+                          array('original' => $org->content),
+                          array('id' => $_POST['data']['id']));
+        }
+        die($wpdb->update("contrib",
+                          array('content' => $_POST['data']['content']),
+                          array('id' => $_POST['data']['id'])));
+        break;
+    case 'title':
+        die($wpdb->update("contrib",
+                          array('title' => $_POST['data']['title']),
+                          array('id' => $_POST['data']['id'])));
+        break;
+
+    case 'status':
+        die($wpdb->update("contrib",
+                          array('status' => !($org->status)),
+                          array('id' => $_POST['data']['id'])));
+        break;
+    }
+}
+add_action('wp_ajax_update_contrib', 'wpgd_update_contrib');
 ?>

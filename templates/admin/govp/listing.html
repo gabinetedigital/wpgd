@@ -1,10 +1,12 @@
 <div class="wrap">
   <h2>{{ count }} Contribuições</h2>
 
+  <div class="wpgd-status-bar">loading...</div>
   <table class="wp-list-table widefat fixed audiences" cellspacing="0">
     <thead>
       <tr>
-        <th style="width:10%">ID</th>
+        <th>Approved?</th>
+        <th style="width:5%">ID</th>
         <th>Title</th>
         <th>Content</th>
         <th>Theme</th>
@@ -14,11 +16,24 @@
     </thead>
     <tbody>
       {% for contrib in listing %}
-      <tr>
+
+        {% if contrib.status == 1 %}
+      <tr class="approved">
+        {% else %}
+      <tr class="disapproved">
+        {% endif %}
+
+        <td class="contrib-status"
+            id="contrib-status[{{contrib.id}}]">
+          <input type="checkbox" {{contrib.status|replace({1:'checked',0:''})}}>
+          </td>
         <td>{{ contrib.id }}</td>
-        <td>{{ contrib.title }}</td>
-        <td>{{ contrib.content }}</td>
-        <td>{{ contrib.theme }}</td>
+        <td id="contrib-title[{{contrib.id}}]"
+            class="contribution-title">{{ contrib.title }}</td>
+        <td id="contrib[{{contrib.id}}]"
+            class="contribution">{{ contrib.content }}</td>
+        <td id="contrib-theme[{{contrib.id}}]"
+            class="contrib-theme">{{ contrib.theme }}</td>
         <td>{{ contrib.creation_date|date("d/m/Y") }}</td>
         <td>{{ contrib.display_name }}</td>
       </tr>
@@ -27,6 +42,7 @@
 
     <tfoot>
       <tr>
+        <th classs="manage-column sortable desc" scope="col">Approved?</th>
         <th classs="manage-column sortable desc" scope="col">ID</th>
         <th classs="manage-column sortable desc" scope="col">Title</th>
         <th classs="manage-column sortable asc" scope="col">Content</th>
