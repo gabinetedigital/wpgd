@@ -9,6 +9,7 @@
         <th>Content</th>
         <th>Theme</th>
         <th class="column-date">Creation date</th>
+        <th>Author</th>
       </tr>
     </thead>
     <tbody>
@@ -19,6 +20,7 @@
         <td>{{ contrib.content }}</td>
         <td>{{ contrib.theme }}</td>
         <td>{{ contrib.creation_date|date("d/m/Y") }}</td>
+        <td>{{ contrib.display_name }}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -30,6 +32,7 @@
         <th classs="manage-column sortable asc" scope="col">Content</th>
         <th classs="manage-column sortable asc" scope="col">Theme</th>
         <th classs="manage-column sortable desc" scope="col">Creation Date</th>
+        <th classs="manage-column sortable desc" scope="col">Author</th>
       </tr>
     </tfoot>
   </table>

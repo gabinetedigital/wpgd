@@ -19,10 +19,12 @@
 function wpgd_govp_get_contribs($where=null, $orderby=null, $limit=null) {
     global $wpdb;
     $sql = "
-      SELECT id, title, content, creation_date, theme
-      FROM contrib ";
+      SELECT c.id, c.title, c.content, c.creation_date, c.theme,".
+      " u.display_name ".
+      " FROM contrib c, wp_users u ".
+      " WHERE c.user_id=u.ID ";
     if (isset($where))
-        $sql .= "WHERE $where ";
+        $sql .= " AND $where ";
     if (isset($orderby))
         $sql .= "ORDER BY $orderby ";
     if (isset($limit))
