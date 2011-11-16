@@ -3,11 +3,11 @@
     height: 200px;
 }
 
-.approved {
+.wpgd-approved {
     background-color:#E0FFD1;
 }
 
-.disapproved {
+.wpgd-disapproved {
     background-color:#FFE6E6;
 }
 

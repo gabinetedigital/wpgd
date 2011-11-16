@@ -72,7 +72,7 @@ jQuery(function() {
       data: {action:'update_contrib',data:data},
       success: function() {
         $(".wpgd-status-bar").slideUp();
-        tr.toggleClass("approved disapproved");
+        tr.toggleClass("wpgd-approved wpgd-disapproved");
       }
     });
   });
