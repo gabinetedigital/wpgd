@@ -79,6 +79,12 @@ function wpgd_update_contrib() {
                           array('status' => !($org->status)),
                           array('id' => $_POST['data']['id'])));
         break;
+    case 'parent':
+        error_log(var_export($_POST['data'],true));
+        die($wpdb->update("contrib",
+                          array('parent' => $_POST['data']['parent']),
+                          array('id' => $_POST['data']['id'])));
+        break;
     }
 }
 add_action('wp_ajax_update_contrib', 'wpgd_update_contrib');

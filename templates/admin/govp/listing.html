@@ -5,50 +5,87 @@
   <table class="wp-list-table widefat fixed audiences" cellspacing="0">
     <thead>
       <tr>
-        <th>Approved?</th>
         <th style="width:5%">ID</th>
-        <th>Title</th>
+        <th style="width:7%">Approved?</th>
+        <th style="width:6%">Parent</th>
+        <th style="width:7%">Theme</th>
+        <th class="column-date" style="width:8%">Creation date</th>
+        <th style="width:10%">Author</th>
+        <th style="width:15%">Title</th>
         <th>Content</th>
-        <th>Theme</th>
-        <th class="column-date">Creation date</th>
-        <th>Author</th>
       </tr>
     </thead>
-    <tbody>
+    <tbody id="contrib-rows">
       {% for contrib in listing %}
 
-        {% if contrib.status == 1 %}
-      <tr class="wpgd-approved">
+        {% if contrib.status == 1 and contrib.parent == 0 %}
+      <tr class="wpgd-approved" id="row{{ contrib.id }}">
         {% else %}
-      <tr class="wpgd-disapproved">
+          {% if contrib.parent == 0 %}
+        <tr class="wpgd-disapproved" id="row-{{ contrib.id }}">
+          {% else %}
+        <tr id="row-{{ contrib.id }}">
+          {% endif %}
         {% endif %}
+
+        <td class="contrib-id">{{ contrib.id }}</td>
 
         <td class="contrib-status"
             id="contrib-status[{{contrib.id}}]">
-          <input type="checkbox" {{contrib.status|replace({1:'checked',0:''})}}>
+          <input type="checkbox"
+                 {% if contrib.parent != 0 %}
+                 style="display:none"
+                 {% endif %}
+                 {{contrib.status|replace({1:'checked',0:''})}}>
+          <span
+                 {% if contrib.parent == 0 %}
+                 style="display:none"
+                 {% endif %}>
+            ^</span>
           </td>
-        <td>{{ contrib.id }}</td>
+
+        <td>
+          <select class="contrib-parents contrib-parent[{{contrib.parent}}]"
+                  id="contrib-parents[{{contrib.id}}]">
+            <option value="0">None</option>
+            {% for c in listing %}
+              {% if contrib.parent == c.id %}
+              <option value="{{c.id}}" selected>{{c.id}}</option>
+              {% else %}
+                {% if c.id != contrib.id %}
+                <option value="{{c.id}}">{{c.id}}</option>
+                {% endif %}
+              {% endif %}
+            {% endfor %}
+          </select>
+        </td>
+
+        <td id="contrib-theme[{{contrib.id}}]"
+            class="contrib-theme">{{ contrib.theme }}</td>
+
+        <td>{{ contrib.creation_date|date("d/m/Y") }}</td>
+
+
+        <td>{{ contrib.display_name }}</td>
+
         <td id="contrib-title[{{contrib.id}}]"
             class="contribution-title">{{ contrib.title }}</td>
         <td id="contrib[{{contrib.id}}]"
             class="contribution">{{ contrib.content }}</td>
-        <td id="contrib-theme[{{contrib.id}}]"
-            class="contrib-theme">{{ contrib.theme }}</td>
-        <td>{{ contrib.creation_date|date("d/m/Y") }}</td>
-        <td>{{ contrib.display_name }}</td>
       </tr>
       {% endfor %}
     </tbody>
 
     <tfoot>
       <tr>
-        <th classs="manage-column sortable desc" scope="col">Approved?</th>
         <th classs="manage-column sortable desc" scope="col">ID</th>
-        <th classs="manage-column sortable desc" scope="col">Title</th>
-        <th classs="manage-column sortable asc" scope="col">Content</th>
+        <th classs="manage-column sortable desc" scope="col">Approved?</th>
+        <th classs="manage-column sortable desc" scope="col">Parent</th>
         <th classs="manage-column sortable asc" scope="col">Theme</th>
         <th classs="manage-column sortable desc" scope="col">Creation Date</th>
         <th classs="manage-column sortable desc" scope="col">Author</th>
+        <th classs="manage-column sortable desc" scope="col">Title</th>
+        <th classs="manage-column sortable asc" scope="col">Content</th>
       </tr>
     </tfoot>
   </table>

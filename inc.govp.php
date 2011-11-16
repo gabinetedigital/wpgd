@@ -16,27 +16,45 @@
  */
 
 
-function wpgd_govp_get_contribs($where=null, $orderby=null, $limit=null) {
+function wpgd_govp_get_contribs() {
+
+    function index_of($arr, $id) {
+        $f = array_filter($arr,
+                          function($x) use ($id) {
+                              return $x['id'] == $id;
+                          });
+        return key($f);
+    }
+
     global $wpdb;
     $sql = "
       SELECT c.id, c.title, c.content, c.creation_date, c.theme, c.original, ".
-      " c.status, u.display_name ".
+      " c.status, u.display_name, c.parent ".
       " FROM contrib c, wp_users u ".
-      " WHERE c.user_id=u.ID ";
-    if (isset($where))
-        $sql .= " AND $where ";
-    if (isset($orderby))
-        $sql .= "ORDER BY $orderby ";
-    if (isset($limit))
-        $sql .= "LIMIT $limit";
-    return $wpdb->get_results($wpdb->prepare($sql));
+      " WHERE c.user_id=u.ID order by c.id";
+    $results = $wpdb->get_results($wpdb->prepare($sql),ARRAY_A);
+    $roots = array();
+    $children = array();
+    foreach ($results as $r) {
+        if ($r['parent'] == 0) {
+            $roots[] = $r;
+        } else {
+            $children[] = $r;
+        }
+    }
+    foreach($children as $c) {
+        $idx = index_of($roots, $c['parent']);
+        array_splice($roots, $idx+1, 0, 'An uninteresting value as markplace');
+        $roots[$idx+1] = $c;
+    }
+    return array_map(function($x) { return (object)$x; },$roots);
 }
 
 function wpgd_govp_get_contrib($id) {
     global $wpdb;
     $sql = "
       SELECT c.id, c.title, c.content, c.creation_date, c.theme, c.original, ".
-      " c.status, u.display_name ".
+      " c.status, u.display_name, c.parent ".
       " FROM contrib c, wp_users u ".
       " WHERE c.user_id=u.ID AND c.id=%d";
     return array_pop($wpdb->get_results($wpdb->prepare($sql,array($id))));
