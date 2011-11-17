@@ -80,7 +80,6 @@ function wpgd_update_contrib() {
                           array('id' => $_POST['data']['id'])));
         break;
     case 'parent':
-        error_log(var_export($_POST['data'],true));
         die($wpdb->update("contrib",
                           array('parent' => $_POST['data']['parent']),
                           array('id' => $_POST['data']['id'])));
@@ -88,4 +87,38 @@ function wpgd_update_contrib() {
     }
 }
 add_action('wp_ajax_update_contrib', 'wpgd_update_contrib');
+
+function wpgd_insert_contrib() {
+    global $wpdb;
+    $current_user = wp_get_current_user();
+    die($wpdb->insert("contrib",
+                      array('parent' => 0,
+                            'theme' => $_POST['data']['theme'],
+                            'title' => $_POST['data']['title'],
+                            'content' => $_POST['data']['content'],
+                            'user_id' => $current_user->ID,
+                            'moderation' => true)));
+}
+
+function wpgd_delete_contrib() {
+    global $wpdb;
+    $id = $_POST['data']['id'];
+    $org = wpgd_govp_get_contrib($id);
+    if ($org->moderation) {
+        $wpdb->query("DELETE FROM contrib WHERE id = '$id'");
+    } else {
+        $wpdb->update("contrib",
+                      array('enabled' => 0),
+                      array('id' => $id));
+    }
+
+    //reparent
+    die($wpdb->update("contrib",
+                      array('parent' => 0),
+                      array('parent' => $id)));
+
+}
+
+add_action('wp_ajax_insert_contrib', 'wpgd_insert_contrib');
+add_action('wp_ajax_delete_contrib', 'wpgd_delete_contrib');
 ?>

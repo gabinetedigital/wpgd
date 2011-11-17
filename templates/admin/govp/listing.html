@@ -1,5 +1,19 @@
 <div class="wrap">
-  <h2>{{ count }} Contribuições</h2>
+  <h2>{{ count }} Contribuições  <a href="javascript:add_new_contrib()" class="add-new-h2">Add New</a></h2>
+
+  <div class="wpgd-new-contrib" style="display:none">
+    Theme:<select class="wpgd-theme">
+      <option name="cuidado">cuidado</option>
+      <option name="familia">familia</option>
+      <option name="emergencia">emergencia</option>
+      <option name="medicamentos">medicamentos</option>
+      <option name="regional">regional</option>
+    </select>
+    Title: <input type="text" name="title">
+    Content: <textarea name="content"> </textarea>
+    <input type="button" name="OK" value="OK">
+    <input type="button" name="Cancel" value="Cancel">
+  </div>
 
   <div class="wpgd-status-bar">loading...</div>
   <table class="wp-list-table widefat fixed audiences" cellspacing="0">
@@ -18,15 +32,22 @@
     <tbody id="contrib-rows">
       {% for contrib in listing %}
 
-        {% if contrib.status == 1 and contrib.parent == 0 %}
-      <tr class="wpgd-approved" id="row{{ contrib.id }}">
+        {% if contrib.parent != 0 %}
+          {% set apr = "" %}
         {% else %}
-          {% if contrib.parent == 0 %}
-        <tr class="wpgd-disapproved" id="row-{{ contrib.id }}">
+          {% if contrib.status == 1 %}
+           {% set apr = "wpgd-approved" %}
           {% else %}
-        <tr id="row-{{ contrib.id }}">
+           {% set apr = "wpgd-disapproved" %}
           {% endif %}
         {% endif %}
+
+        {% if contrib.parent == 0 %}
+         {% set prt = "" %}
+        {% else %}
+         {% set prt = "is-child child-of-" ~ contrib.parent %}
+        {% endif %}
+      <tr class="{{apr}} {{prt}}" id="row-{{ contrib.id }}">
 
         <td class="contrib-id">{{ contrib.id }}</td>
 
@@ -42,9 +63,14 @@
                  style="display:none"
                  {% endif %}>
             ^</span>
+
+          {% if contrib.moderation == 1 %}
+          <a class="delete-contrib" href="{{contrib.id}}">X</a>
+          {% endif %}
           </td>
 
         <td>
+          {% if contrib.moderation == 0 %}
           <select class="contrib-parents contrib-parent[{{contrib.parent}}]"
                   id="contrib-parents[{{contrib.id}}]">
             <option value="0">None</option>
@@ -58,6 +84,7 @@
               {% endif %}
             {% endfor %}
           </select>
+          {% endif %}
         </td>
 
         <td id="contrib-theme[{{contrib.id}}]"

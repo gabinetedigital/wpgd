@@ -1,24 +1,71 @@
+function add_new_contrib() {
+  jQuery(".wpgd-new-contrib").show();
+}
+
 jQuery(function() {
   var $ = jQuery;
 
-  $.fn.find_first = function(fn) {
-    var self = $(this);
-    for(var i = 0; i < self.length; i++) {
-      var x = $(self[i])
-      if (fn(x)) {
-        return x;
-      }
-    }
-    return null;
-  }
+  //form to insert contribution
+  $(".wpgd-new-contrib input[name=Cancel]").click(
+    function() { $(".wpgd-new-contrib").hide()});
 
+  $(".wpgd-new-contrib input[name=OK]").click(function() {
+    var theme = $(".wpgd-new-contrib select").val();
+    var title = $(".wpgd-new-contrib input[type=text]").attr("value");
+    var content = $(".wpgd-new-contrib textarea").val();
+    slow_operation(function(done) {
+      $.ajax({
+        url: 'admin-ajax.php',
+        type: 'post',
+        data: {action:'insert_contrib',
+               data:{theme:theme,title:title,content:content}},
+        success: function(data) {
+          done();
+          window.location.reload();
+        }
+      });
+    });
+  });
+
+  //delete contrib
+  $(".delete-contrib").click(function(ev) {
+    ev.preventDefault();
+    if (confirm("Are you sure you want to delete?")) {
+      var id = $(this).attr("href");
+      if ($(".child-of-"+id).length > 0) {
+        alert("Unassociate children before removing this");
+        return;
+      }
+      slow_operation(function(done) {
+        $.ajax({
+          url: 'admin-ajax.php',
+          type: 'post',
+          data: {action:'delete_contrib',
+                 data:{id:id}},
+          success: function(data) {
+            done();
+            window.location.reload();
+          }
+        });
+      });
+    }
+  });
+
+
+  //"loading..." stuff
   function slow_operation(fn) {
     $(".wpgd-status-bar").slideDown();
     fn(function() { $(".wpgd-status-bar").slideUp(); });
   }
 
-  function get_row_id(row) {
-    return parseInt(row.attr("id").split("-")[1]);
+
+  //useful functions...
+  function get_row_id(tr) {
+    return parseInt(tr.attr("id").split("-")[1]);
+  }
+
+  function is_child(id) {
+    return $("#row-"+id).hasClass("is-child");
   }
 
   function move_parent_row(id) {
@@ -45,7 +92,7 @@ jQuery(function() {
     }
   }
 
-
+  //event binder
   function inliner(dbfield, accessor, editable) {
     var original_text;
     var td;
@@ -87,7 +134,7 @@ jQuery(function() {
     return show_field;
   }
 
-  //title and content inline editing
+  //binding events: title and content inline editing
 
   $(".contribution").bind(
     'dblclick',inliner('content',$().val, $("<textarea/>")));
@@ -121,14 +168,20 @@ jQuery(function() {
     });
   });
 
-  //parenting
+
+  //re-parenting events
   $(".contrib-parents").change(function() {
     var self = $(this);
     var id = /\[([0-9]+)\]/.exec(self.attr("id"))[1];
     var parent = /contrib-parent\[([0-9]+)\]/.exec(self.attr("class"))[1];
+    var new_parent = self.val();
+    if (is_child(new_parent)) {
+      alert("Can't be a child of a child")
+      self.val(parent);
+      return;
+    }
     if (parent != self.val())
       if (confirm("Confirm change?")) {
-        var new_parent = self.val();
         var data = {id:id,field:'parent', parent:new_parent};
         slow_operation(function(done) {
           $.ajax({
@@ -150,7 +203,12 @@ jQuery(function() {
                 } else {
                   tr.addClass("wpgd-disapproved");
                 }
+                tr.removeClass("child-of-"+parent);
+                tr.removeClass("is-child");
               } else {
+                tr.removeClass("child-of-"+parent);
+                tr.addClass("child-of-"+new_parent);
+                tr.addClass("is-child");
                 //arrange it below the parent
                 $("#row-"+new_parent).after(tr.detach());
                 //remove the approved/disapproved class

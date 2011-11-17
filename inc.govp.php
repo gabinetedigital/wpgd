@@ -29,9 +29,9 @@ function wpgd_govp_get_contribs() {
     global $wpdb;
     $sql = "
       SELECT c.id, c.title, c.content, c.creation_date, c.theme, c.original, ".
-      " c.status, u.display_name, c.parent ".
+      " c.status, u.display_name, c.parent, c.moderation ".
       " FROM contrib c, wp_users u ".
-      " WHERE c.user_id=u.ID order by c.id";
+      " WHERE c.user_id=u.ID AND c.enabled=1 order by c.id";
     $results = $wpdb->get_results($wpdb->prepare($sql),ARRAY_A);
     $roots = array();
     $children = array();
@@ -54,18 +54,16 @@ function wpgd_govp_get_contrib($id) {
     global $wpdb;
     $sql = "
       SELECT c.id, c.title, c.content, c.creation_date, c.theme, c.original, ".
-      " c.status, u.display_name, c.parent ".
+      " c.status, u.display_name, c.parent, c.moderation ".
       " FROM contrib c, wp_users u ".
-      " WHERE c.user_id=u.ID AND c.id=%d";
+      " WHERE c.user_id=u.ID AND c.enabled=true AND c.id=%d";
     return array_pop($wpdb->get_results($wpdb->prepare($sql,array($id))));
 }
 
 
-function wpgd_govp_get_contrib_count($where=null) {
+function wpgd_govp_get_contrib_count() {
     global $wpdb;
-    $sql = "SELECT count(id) FROM contrib ";
-    if (isset($where))
-        $sql .= "WHERE $where ";
+    $sql = "SELECT count(id) FROM contrib WHERE enabled=1 ";
     return $wpdb->get_var($wpdb->prepare($sql));
 }
 
