@@ -49,7 +49,8 @@ function wpgd_govp_main() {
     $ctx['listing'] = wpgd_govp_get_contribs();
     $ctx['count'] = wpgd_govp_get_contrib_count();
     $ctx['siteurl'] = get_bloginfo('siteurl');
-    echo $renderer->render('admin/govp/listing.html', $ctx);
+    $r = $renderer->render('admin/govp/listing.html', $ctx);
+    echo iconv("UTF-8", "ISO-8859-1", $r);
 }
 
 function wpgd_update_contrib() {
