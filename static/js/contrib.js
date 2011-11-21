@@ -51,6 +51,28 @@ jQuery(function() {
     }
   });
 
+  $(".wpgd-theme").change(function() {
+    var self = $(this);
+    var id = /\[([0-9]+)\]/.exec(self.attr("id"))[1];
+    var current = /wpgd-the-theme\[([a-zA-Z]+)\]/.exec(self.attr("class"))[1];
+    if(confirm("Change the theme?")) {
+      var data = {id:id,field:'theme', 'theme': self.val()};
+      slow_operation(function(done) {
+        $.ajax({
+          url: 'admin-ajax.php',
+          type: 'post',
+          data: {action:'update_contrib',
+                 data:data},
+          success: function(data) {
+            done();
+            window.location.reload();
+          }
+        });
+      });
+    } else {
+      self.val(current);
+    }
+  });
 
   //"loading..." stuff
   function slow_operation(fn) {

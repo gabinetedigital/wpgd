@@ -87,6 +87,11 @@ function wpgd_update_contrib() {
                           array('parent' => $_POST['data']['parent']),
                           array('id' => $_POST['data']['id'])));
         break;
+    case 'theme':
+        die($wpdb->update("contrib",
+                          array('theme' => $_POST['data']['theme']),
+                          array('id' => $_POST['data']['id'])));
+        break;
     }
 }
 add_action('wp_ajax_update_contrib', 'wpgd_update_contrib');

@@ -97,7 +97,15 @@
         </td>
 
         <td id="contrib-theme[{{contrib.id}}]"
-            class="contrib-theme">{{ contrib.theme }}</td>
+            class="contrib-theme">
+          <select class="wpgd-theme wpgd-the-theme[{{contrib.theme}}]" id="wpgd-theme-id[{{contrib.id}}]" name="theme">
+            <option name="cuidado" {% if contrib.theme  == 'cuidado' %} selected {% endif %}>cuidado</option>
+            <option name="familia"  {% if contrib.theme  == 'familia' %} selected {% endif %}>familia</option>
+            <option name="emergencia"  {% if contrib.theme  == 'emergencia' %} selected {% endif %}>emergencia</option>
+            <option name="medicamentos"  {% if contrib.theme  == 'medicamentos' %} selected {% endif %}>medicamentos</option>
+            <option name="regional"  {% if contrib.theme  == 'regional' %} selected {% endif %}>regional</option>
+          </select>
+        </td>
 
         <td>{{ contrib.creation_date|date("d/m/Y") }}</td>
 
