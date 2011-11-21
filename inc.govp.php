@@ -16,7 +16,19 @@
  */
 
 
-function wpgd_govp_get_contribs() {
+function wpgd_govp_get_contribs($sortby) {
+    $sortfields = array(
+                        'id' => 'c.id' ,
+                        'status' => 'c.status',
+                        'theme' => 'c.theme',
+                        'date'  => 'c.creation_date',
+                        'author' => 'u.display_name',
+                        'title' => 'c.title');
+    if (isset($sortfields[$sortby])) {
+        $sortfield = $sortfields[$sortby];
+    } else {
+        $sortfield = 'c.id';
+    }
 
     function index_of($arr, $id) {
         $f = array_filter($arr,
@@ -29,9 +41,9 @@ function wpgd_govp_get_contribs() {
     global $wpdb;
     $sql = "
       SELECT c.id, c.title, c.content, c.creation_date, c.theme, c.original, ".
-      " c.status, u.display_name, c.parent, c.moderation, u.ID as user_id ".
-      " FROM contrib c, wp_users u ".
-      " WHERE c.user_id=u.ID AND c.enabled=1 order by c.id";
+        " c.status, u.display_name, c.parent, c.moderation, u.ID as user_id ".
+        " FROM contrib c, wp_users u ".
+        " WHERE c.user_id=u.ID AND c.enabled=1 order by $sortfield";
     $results = $wpdb->get_results($wpdb->prepare($sql),ARRAY_A);
     $roots = array();
     $children = array();

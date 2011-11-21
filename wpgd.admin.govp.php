@@ -46,11 +46,12 @@ add_action('admin_menu', function () {
 function wpgd_govp_main() {
     global $renderer;
     $ctx = array();
-    $ctx['listing'] = wpgd_govp_get_contribs();
+    $ctx['listing'] = wpgd_govp_get_contribs($_GET["sort"]);
     $ctx['count'] = wpgd_govp_get_contrib_count();
     $ctx['siteurl'] = get_bloginfo('siteurl');
-    $r = $renderer->render('admin/govp/listing.html', $ctx);
-    echo iconv("UTF-8", "ISO-8859-1", $r);
+    $ctx['sortby'] = get_query_var("sort");
+    $ctx['pageurl'] = remove_query_arg("sort");
+    echo $renderer->render('admin/govp/listing.html', $ctx);
 }
 
 function wpgd_update_contrib() {
