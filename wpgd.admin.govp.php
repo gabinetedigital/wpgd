@@ -48,6 +48,7 @@ function wpgd_govp_main() {
     $ctx = array();
     $ctx['listing'] = wpgd_govp_get_contribs();
     $ctx['count'] = wpgd_govp_get_contrib_count();
+    $ctx['siteurl'] = get_bloginfo('siteurl');
     echo $renderer->render('admin/govp/listing.html', $ctx);
 }
 

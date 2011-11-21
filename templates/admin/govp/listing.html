@@ -93,7 +93,7 @@
         <td>{{ contrib.creation_date|date("d/m/Y") }}</td>
 
 
-        <td>{{ contrib.display_name }}</td>
+        <td><a href="{{siteurl}}/wp-admin/user-edit.php?user_id={{ contrib.user_id }}"> {{ contrib.display_name }}</td>
 
         <td id="contrib-title[{{contrib.id}}]"
             class="contribution-title">{{ contrib.title }}</td>

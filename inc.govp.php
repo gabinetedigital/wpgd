@@ -29,7 +29,7 @@ function wpgd_govp_get_contribs() {
     global $wpdb;
     $sql = "
       SELECT c.id, c.title, c.content, c.creation_date, c.theme, c.original, ".
-      " c.status, u.display_name, c.parent, c.moderation ".
+      " c.status, u.display_name, c.parent, c.moderation, u.ID as user_id ".
       " FROM contrib c, wp_users u ".
       " WHERE c.user_id=u.ID AND c.enabled=1 order by c.id";
     $results = $wpdb->get_results($wpdb->prepare($sql),ARRAY_A);
