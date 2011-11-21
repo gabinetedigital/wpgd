@@ -50,6 +50,16 @@ function wpgd_govp_main() {
 
     $ctx = array();
     $ctx['listing'] = wpgd_govp_get_contribs($_GET["sort"],$_GET['paged'],$perpage);
+
+
+    //odin sent me...
+    foreach($ctx['listing'] as $obj) {
+        if ($obj->moderation == 0) { //contrib registered through the portal
+            $obj->title =  iconv('UTF-8', 'iso-8859-1', $obj->title);
+            $obj->content =  iconv('UTF-8', 'iso-8859-1', $obj->content);
+        } //else: contrib registered through WP
+    }
+
     $ctx['count'] = wpgd_govp_get_contrib_count();
     $ctx['siteurl'] = get_bloginfo('siteurl');
     $ctx['sortby'] = get_query_var("sort");
