@@ -16,7 +16,10 @@
  */
 
 
-function wpgd_govp_get_contribs($sortby) {
+function wpgd_govp_get_contribs($sortby, $page, $perpage) {
+    $page = (strlen($page) == 0) ?  '0' : $page;
+    $offset = $page * $perpage;
+
     $sortfields = array(
                         'id' => 'c.id' ,
                         'status' => 'c.status',
@@ -43,7 +46,7 @@ function wpgd_govp_get_contribs($sortby) {
       SELECT c.id, c.title, c.content, c.creation_date, c.theme, c.original, ".
         " c.status, u.display_name, c.parent, c.moderation, u.ID as user_id ".
         " FROM contrib c, wp_users u ".
-        " WHERE c.user_id=u.ID AND c.enabled=1 order by $sortfield";
+        " WHERE c.user_id=u.ID AND c.enabled=1 order by $sortfield LIMIT $offset, $perpage";
     $results = $wpdb->get_results($wpdb->prepare($sql),ARRAY_A);
     $roots = array();
     $children = array();

@@ -45,12 +45,19 @@ add_action('admin_menu', function () {
 
 function wpgd_govp_main() {
     global $renderer;
+    $perpage = 50;
+    $page = (int) (isset($_GET["paged"]) ? $_GET["paged"] : '0');
+
     $ctx = array();
-    $ctx['listing'] = wpgd_govp_get_contribs($_GET["sort"]);
+    $ctx['listing'] = wpgd_govp_get_contribs($_GET["sort"],$_GET['paged'],$perpage);
     $ctx['count'] = wpgd_govp_get_contrib_count();
     $ctx['siteurl'] = get_bloginfo('siteurl');
     $ctx['sortby'] = get_query_var("sort");
+    $ctx['paged'] =  $page;
+    $ctx['numpages'] = ceil($ctx['count'] / $perpage);
+    $ctx['perpage'] = $perpage;
     $ctx['pageurl'] = remove_query_arg("sort");
+    $ctx['pageurl'] = remove_query_arg("paged");
     echo $renderer->render('admin/govp/listing.html', $ctx);
 }
 
