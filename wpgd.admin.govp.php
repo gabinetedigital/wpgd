@@ -57,6 +57,7 @@ function wpgd_govp_main() {
         if ($obj->moderation == 0) { //contrib registered through the portal
             $obj->title =  iconv('UTF-8', 'iso-8859-1', $obj->title);
             $obj->content =  iconv('UTF-8', 'iso-8859-1', $obj->content);
+            $obj->display_name =  iconv('UTF-8', 'iso-8859-1', $obj->display_name);
         } //else: contrib registered through WP
     }
 
