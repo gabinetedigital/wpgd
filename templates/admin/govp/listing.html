@@ -1,18 +1,29 @@
 <div class="wrap">
   <h2>{{ count }} Contributions  <a href="javascript:add_new_contrib()" class="add-new-h2">Add New</a></h2>
 
-  <div class="wpgd-new-contrib" style="display:none">
-    Theme:<select class="wpgd-theme">
-      <option name="cuidado">cuidado</option>
-      <option name="familia">familia</option>
-      <option name="emergencia">emergencia</option>
-      <option name="medicamentos">medicamentos</option>
-      <option name="regional">regional</option>
-    </select>
-    Title: <input type="text" name="title">
-    Content: <textarea name="content"> </textarea>
-    <input type="button" name="OK" value="OK">
-    <input type="button" name="Cancel" value="Cancel">
+  <div class="wpgd-new-contrib stuffbox" style="display:none">
+    <form class="form-wrap">
+      <div class="form-field">
+        <label for="theme">Theme</label>
+        <select class="wpgd-theme" name="theme">
+          <option name="cuidado">cuidado</option>
+          <option name="familia">familia</option>
+          <option name="emergencia">emergencia</option>
+          <option name="medicamentos">medicamentos</option>
+          <option name="regional">regional</option>
+        </select>
+      </div>
+      <div class="form-field">
+        <label for="title">Title</label>
+        <input type="text" name="title" style="width:518px">
+      </div>
+      <div class="form-field">
+        <label for="content">Content</label>
+        <textarea name="content" style="width:500px;height:200px" maxlength="600"> </textarea>
+      </div>
+    <input type="button" name="OK" class="button" value="OK">
+    <input type="button" name="Cancel" class=" button" value="Cancel">
+    </form>
   </div>
 
   <div class="wpgd-status-bar">loading...</div>
