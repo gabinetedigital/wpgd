@@ -60,7 +60,10 @@
         {% endif %}
       <tr class="{{apr}} {{prt}}" id="row-{{ contrib.id }}">
 
-        <td class="contrib-id">{{ contrib.id }}</td>
+        <td class="contrib-id">
+          <a class="delete-contrib" href="{{contrib.id}}">X</a>
+          {{ contrib.id }}
+        </td>
 
         <td class="contrib-status"
             id="contrib-status[{{contrib.id}}]">
@@ -74,8 +77,6 @@
                  style="display:none"
                  {% endif %}>
             ^</span>
-
-          <a class="delete-contrib" href="{{contrib.id}}">X</a>
           </td>
 
         <td>
