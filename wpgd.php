@@ -38,10 +38,15 @@ function wpgd_admin_govp_install() {
     add_role( 'wpgd_moderator', 'Moderador',
               array( 'read' => true,
                      'moderate_contrib' => true ) );
+
+    $role_object = get_role( 'administrator' );
+    $role_object->add_cap( 'moderate_contrib' );
 }
 
 function wpgd_admin_govp_uninstall() {
     remove_role( 'wpgd_moderator');
+    $role_object = get_role( 'administrator' );
+    $role_object->remove_cap( 'moderate_contrib' );
 }
 
 register_activation_hook(__FILE__, 'wpgd_admin_govp_install');
