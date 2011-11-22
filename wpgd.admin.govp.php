@@ -38,7 +38,7 @@ add_action('admin_menu', function () {
     $menupage = __FILE__;
 
     add_menu_page(
-        'Governador Pergunta', 'Governador Pergunta', 'administrator',
+        'Governador Pergunta', 'Governador Pergunta', 'moderate_contrib',
         $menupage, 'wpgd_govp_main');
 });
 

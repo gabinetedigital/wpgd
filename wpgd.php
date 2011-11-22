@@ -34,6 +34,19 @@ include("wpgd.xmlrpc.php");
 
 register_activation_hook(__FILE__, 'wpgd_admin_videos_install');
 
+function wpgd_admin_govp_install() {
+    add_role( 'wpgd_moderator', 'Moderador',
+              array( 'read' => true,
+                     'moderate_contrib' => true ) );
+}
+
+function wpgd_admin_govp_uninstall() {
+    remove_role( 'wpgd_moderator');
+}
+
+register_activation_hook(__FILE__, 'wpgd_admin_govp_install');
+register_deactivation_hook(__FILE__, 'wpgd_admin_govp_uninstall');
+
 wpgd_thumbs_init_sizes();
 
 ?>
