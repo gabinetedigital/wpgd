@@ -42,6 +42,20 @@
                     combine: {
                         color: '#999',
                         threshold: 0.1
+                    },
+                    label: {
+                        formatter: function(label, series) {
+                            console.debug(series);
+
+                            return '<div style="font-size:8pt;'
+                                + 'text-align:center;'
+                                + 'color:'
+                                + series.color + ';">'
+                                + label + '<br>'
+                                + Math.round(series.percent) + '% ('
+                                + series.data[0][1]
+                                + ')</div>';
+                        }
                     }
 		}
 	    },
