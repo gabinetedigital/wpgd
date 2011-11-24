@@ -23,25 +23,6 @@ add_action('init', function () {
     if (is_admin()) {
         wp_enqueue_script('jquery');
         wp_enqueue_script('jquery-ui-core');
-        wp_enqueue_script(
-            'wpgd-contrib',
-            plugins_url('static/js/contrib.js', __FILE__));
-
-        wp_enqueue_style(
-            'wpgd-contrib-css',
-            plugins_url('static/css/contrib.css', __FILE__));
-
-        wp_enqueue_script(
-            'flot',
-            plugins_url('static/js/jquery.flot.min.js', __FILE__));
-
-        wp_enqueue_script(
-            'flot-pie',
-            plugins_url('static/js/jquery.flot.pie.js', __FILE__));
-
-        wp_enqueue_script(
-            'stats',
-            plugins_url('static/js/stats.js', __FILE__));
     }
 });
 
@@ -49,13 +30,42 @@ add_action('init', function () {
 add_action('admin_menu', function () {
     $menupage = __FILE__;
 
-    add_menu_page(
+    $contribs = add_menu_page(
         'Governador Pergunta', 'Governador Pergunta', 'moderate_contrib',
         $menupage, 'wpgd_govp_main');
 
-    add_submenu_page(
+    $stats = add_submenu_page(
         $menupage, 'Stats', 'Stats',
         'moderate_contrib', 'gd-admin-stats', 'wpgd_govp_stats');
+
+    /* Loading javascript */
+    add_action('admin_enqueue_scripts', function ($hooksufix) use ($contribs, $stats) {
+        switch ($hooksufix) {
+        case $contribs:
+            wp_enqueue_script(
+                'wpgd-contrib',
+                plugins_url('static/js/contrib.js', __FILE__));
+
+            wp_enqueue_style(
+                'wpgd-contrib-css',
+                plugins_url('static/css/contrib.css', __FILE__));
+            break;
+
+        case $stats:
+            wp_enqueue_script(
+                'flot',
+                plugins_url('static/js/jquery.flot.min.js', __FILE__));
+
+            wp_enqueue_script(
+                'flot-pie',
+                plugins_url('static/js/jquery.flot.pie.js', __FILE__));
+
+            wp_enqueue_script(
+               'stats',
+               plugins_url('static/js/stats.js', __FILE__));
+            break;
+        }
+    });
 });
 
 
