@@ -82,4 +82,40 @@ function wpgd_govp_get_contrib_count() {
     return $wpdb->get_var($wpdb->prepare($sql));
 }
 
+
+function wpgd_govp_get_contrib_count_grouped_by_date() {
+    global $wpdb;
+    $sql = "SELECT
+      year(c.creation_date) AS year,
+      month(c.creation_date) AS month,
+      day(c.creation_date) AS day,
+      date(c.creation_date) AS date,
+      count(c.id) AS count
+    FROM contrib AS c GROUP BY DATE(c.creation_date);";
+    return $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+}
+
+
+function wpgd_govp_get_contrib_count_grouped_by_theme() {
+    global $wpdb;
+    $sql = "SELECT
+      c.theme, count(c.id) AS count FROM contrib AS c
+    GROUP BY c.theme;";
+    return $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+}
+
+
+function wpgd_govp_get_contrib_count_grouped_by_themedate() {
+    global $wpdb;
+    $sql = "SELECT
+      c.theme,
+      date(c.creation_date) AS date,
+      count(c.id) AS count,
+      year(c.creation_date) AS year,
+      month(c.creation_date) AS month,
+      day(c.creation_date) AS day,
+      date(c.creation_date) AS date
+    FROM contrib AS c GROUP BY c.theme, date(c.creation_date);";
+    return $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+}
 ?>

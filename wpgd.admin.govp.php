@@ -30,9 +30,20 @@ add_action('init', function () {
         wp_enqueue_style(
             'wpgd-contrib-css',
             plugins_url('static/css/contrib.css', __FILE__));
+
+        wp_enqueue_script(
+            'flot',
+            plugins_url('static/js/jquery.flot.min.js', __FILE__));
+
+        wp_enqueue_script(
+            'flot-pie',
+            plugins_url('static/js/jquery.flot.pie.js', __FILE__));
+
+        wp_enqueue_script(
+            'stats',
+            plugins_url('static/js/stats.js', __FILE__));
     }
-  }
-);
+});
 
 
 add_action('admin_menu', function () {
@@ -41,6 +52,10 @@ add_action('admin_menu', function () {
     add_menu_page(
         'Governador Pergunta', 'Governador Pergunta', 'moderate_contrib',
         $menupage, 'wpgd_govp_main');
+
+    add_submenu_page(
+        $menupage, 'Stats', 'Stats',
+        'moderate_contrib', 'gd-admin-stats', 'wpgd_govp_stats');
 });
 
 
@@ -72,6 +87,20 @@ function wpgd_govp_main() {
     $ctx['pageurl'] = remove_query_arg("paged");
     echo $renderer->render('admin/govp/listing.html', $ctx);
 }
+
+
+function wpgd_govp_stats() {
+    global $renderer;
+    $ctx = array();
+    $ctx['chart_byday'] =
+        json_encode(wpgd_govp_get_contrib_count_grouped_by_date());
+    $ctx['chart_bytheme'] =
+        json_encode(wpgd_govp_get_contrib_count_grouped_by_theme());
+    $ctx['chart_bythemedate'] =
+        json_encode(wpgd_govp_get_contrib_count_grouped_by_themedate());
+    echo $renderer->render('admin/govp/stats.html', $ctx);
+}
+
 
 function wpgd_update_contrib() {
     //backup the original author's contribution before updating it
