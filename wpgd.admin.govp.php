@@ -16,6 +16,7 @@
  */
 
 include_once('wpgd.templating.php');
+include_once('wpgd.unicode.php');
 include_once('inc.govp.php');
 
 add_action('init', function () {
@@ -55,9 +56,9 @@ function wpgd_govp_main() {
     //odin sent me...
     foreach($ctx['listing'] as $obj) {
         if ($obj->moderation == 0) { //contrib registered through the portal
-            $obj->title =  iconv('UTF-8', 'iso-8859-1', $obj->title);
-            $obj->content =  iconv('UTF-8', 'iso-8859-1', $obj->content);
-            $obj->display_name =  iconv('UTF-8', 'iso-8859-1', $obj->display_name);
+            $obj->title =  wpgd_u($obj->title);
+            $obj->content =  wpgd_u($obj->content);
+            $obj->display_name =  wpgd_u($obj->display_name);
         } //else: contrib registered through WP
     }
 
