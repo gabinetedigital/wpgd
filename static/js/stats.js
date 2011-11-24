@@ -45,8 +45,6 @@
                     },
                     label: {
                         formatter: function(label, series) {
-                            console.debug(series);
-
                             return '<div style="font-size:8pt;'
                                 + 'text-align:center;'
                                 + 'color:'
