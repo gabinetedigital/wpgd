@@ -47,7 +47,11 @@ function wpgd_govp_get_contribs($sortby, $page, $perpage) {
         " FROM contrib c, wp_users u ".
         " WHERE c.user_id=u.ID AND c.enabled=1 order by $sortfield LIMIT $offset, $perpage";
 
+    if(mysql_client_encoding($wpdb->dbh) == 'utf8') {
+        mysql_set_charset( "latin1", $wpdb->dbh );
+    }
     $results = $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+    mysql_set_charset( "utf8", $wpdb->dbh );
 
     $roots = array();
     $children = array();

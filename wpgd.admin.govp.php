@@ -144,6 +144,9 @@ add_action('wp_ajax_update_contrib', 'wpgd_update_contrib');
 
 function wpgd_insert_contrib() {
     global $wpdb;
+    if(mysql_client_encoding($wpdb->dbh) == 'utf8') {
+        mysql_set_charset( "latin1", $wpdb->dbh );
+    }
     $current_user = wp_get_current_user();
     $ret = $wpdb->insert("contrib",
                          array('parent' => 0,
@@ -153,6 +156,7 @@ function wpgd_insert_contrib() {
                                'user_id' => $current_user->ID,
                                'enabled' => 1,
                                'moderation' => true));
+    mysql_set_charset( "utf8", $wpdb->dbh );
     die($ret);
 }
 
