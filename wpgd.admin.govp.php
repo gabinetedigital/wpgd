@@ -163,6 +163,7 @@ function wpgd_insert_contrib() {
                             'title' => $_POST['data']['title'],
                             'content' => $_POST['data']['content'],
                             'user_id' => $current_user->ID,
+                            'enabled' => 1,
                             'moderation' => true)));
 }
 
