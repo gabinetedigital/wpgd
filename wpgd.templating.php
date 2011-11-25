@@ -28,7 +28,8 @@ class WpGdTemplatingRenderer {
     function __construct() {
         $path = join('/', array(dirname(__FILE__), 'templates'));
         $loader = new Twig_Loader_Filesystem($path);
-        $this->twig = new Twig_Environment($loader);
+        $this->twig =
+            new Twig_Environment($loader, array('charset' => 'iso-8859-1'));
     }
 
     public function render($templateName, $context=array()) {

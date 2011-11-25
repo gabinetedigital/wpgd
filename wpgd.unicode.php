@@ -16,11 +16,31 @@
  */
 
 
+/* Data created from flask app is saved in utf8, the php side must do
+ * the same. And we also must show these strings correctly.
+ *
+ * Once I'm not a PHP guru, I have isolated everything that I needed to
+ * convert strings from one encoding to another in this file, cause if
+ * (when) I need to change it, things we'll be easier to find.
+ */
+
+
 /**
- * Function to convert an ascii string to an utf-8 one
+ * Function to convert an utf-8 string to an utf-8 one without errors
+ * (by using the translit version of a problematic char). If the input
+ * string is not utf8.
  */
 function wpgd_u($str) {
-    return iconv('UTF-8', 'iso-8859-1', $str);
+    return mb_detect_encoding($str) == "UTF-8" ?
+        iconv('UTF-8', 'ISO-8859-1//TRANSLIT', $str) : $str;
+}
+
+
+/**
+ * Function that converts an iso-8859-1 string to utf8 
+ */
+function wpgd_e($str) {
+    return utf8_encode($str);
 }
 
 ?>

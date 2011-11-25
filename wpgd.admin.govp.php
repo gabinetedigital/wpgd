@@ -126,12 +126,12 @@ function wpgd_update_contrib() {
                           array('id' => $_POST['data']['id']));
         }
         die($wpdb->update("contrib",
-                          array('content' => $_POST['data']['content']),
+                          array('content' => wpgd_e($_POST['data']['content'])),
                           array('id' => $_POST['data']['id'])));
         break;
     case 'title':
         die($wpdb->update("contrib",
-                          array('title' => $_POST['data']['title']),
+                          array('title' => wpgd_e($_POST['data']['title'])),
                           array('id' => $_POST['data']['id'])));
         break;
 
