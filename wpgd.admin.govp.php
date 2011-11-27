@@ -104,8 +104,11 @@ function wpgd_update_contrib() {
     //backup the original author's contribution before updating it
 
     global $wpdb;
-    $org = wpgd_govp_get_contrib($_POST['data']['id']);
+    if (mysql_client_encoding($wpdb->dbh) == 'utf8') {
+        mysql_set_charset("latin1", $wpdb->dbh);
+    }
 
+    $org = wpgd_govp_get_contrib($_POST['data']['id']);
     switch ($_POST['data']['field']) {
     case 'content':
         if (strlen($org->original) == 0) {
@@ -139,6 +142,7 @@ function wpgd_update_contrib() {
                           array('id' => $_POST['data']['id'])));
         break;
     }
+    mysql_set_charset("utf8", $wpdb->dbh);
 }
 add_action('wp_ajax_update_contrib', 'wpgd_update_contrib');
 
