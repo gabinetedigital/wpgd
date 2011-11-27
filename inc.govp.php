@@ -15,7 +15,6 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-
 function wpgd_govp_get_contribs($sortby, $page, $perpage) {
     $page = (strlen($page) == 0) ?  '0' : $page;
     $offset = $page * $perpage;
@@ -47,7 +46,9 @@ function wpgd_govp_get_contribs($sortby, $page, $perpage) {
         " c.status, u.display_name, c.parent, c.moderation, u.ID as user_id ".
         " FROM contrib c, wp_users u ".
         " WHERE c.user_id=u.ID AND c.enabled=1 order by $sortfield LIMIT $offset, $perpage";
-    $results = $wpdb->get_results($wpdb->prepare($sql),ARRAY_A);
+
+    $results = $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+
     $roots = array();
     $children = array();
     foreach ($results as $r) {
@@ -64,6 +65,7 @@ function wpgd_govp_get_contribs($sortby, $page, $perpage) {
     }
     return array_map(function($x) { return (object)$x; },$roots);
 }
+
 
 function wpgd_govp_get_contrib($id) {
     global $wpdb;

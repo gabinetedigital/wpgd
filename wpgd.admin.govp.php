@@ -16,7 +16,6 @@
  */
 
 include_once('wpgd.templating.php');
-include_once('wpgd.unicode.php');
 include_once('inc.govp.php');
 
 add_action('init', function () {
@@ -76,17 +75,6 @@ function wpgd_govp_main() {
 
     $ctx = array();
     $ctx['listing'] = wpgd_govp_get_contribs($_GET["sort"],$_GET['paged'],$perpage);
-
-
-    //odin sent me...
-    foreach($ctx['listing'] as $obj) {
-        if ($obj->moderation == 0) { //contrib registered through the portal
-            $obj->title =  wpgd_u($obj->title);
-            $obj->content =  wpgd_u($obj->content);
-            $obj->display_name =  wpgd_u($obj->display_name);
-        } //else: contrib registered through WP
-    }
-
     $ctx['count'] = wpgd_govp_get_contrib_count();
     $ctx['siteurl'] = get_bloginfo('siteurl');
     $ctx['sortby'] = get_query_var("sort");
@@ -126,12 +114,12 @@ function wpgd_update_contrib() {
                           array('id' => $_POST['data']['id']));
         }
         die($wpdb->update("contrib",
-                          array('content' => wpgd_e($_POST['data']['content'])),
+                          array('content' => $_POST['data']['content']),
                           array('id' => $_POST['data']['id'])));
         break;
     case 'title':
         die($wpdb->update("contrib",
-                          array('title' => wpgd_e($_POST['data']['title'])),
+                          array('title' => $_POST['data']['title']),
                           array('id' => $_POST['data']['id'])));
         break;
 
@@ -157,14 +145,15 @@ add_action('wp_ajax_update_contrib', 'wpgd_update_contrib');
 function wpgd_insert_contrib() {
     global $wpdb;
     $current_user = wp_get_current_user();
-    die($wpdb->insert("contrib",
-                      array('parent' => 0,
-                            'theme' => $_POST['data']['theme'],
-                            'title' => $_POST['data']['title'],
-                            'content' => $_POST['data']['content'],
-                            'user_id' => $current_user->ID,
-                            'enabled' => 1,
-                            'moderation' => true)));
+    $ret = $wpdb->insert("contrib",
+                         array('parent' => 0,
+                               'theme' => $_POST['data']['theme'],
+                               'title' => $_POST['data']['title'],
+                               'content' => $_POST['data']['content'],
+                               'user_id' => $current_user->ID,
+                               'enabled' => 1,
+                               'moderation' => true));
+    die($ret);
 }
 
 function wpgd_delete_contrib() {
