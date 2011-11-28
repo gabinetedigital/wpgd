@@ -75,7 +75,8 @@ function wpgd_govp_main() {
     $page = (int) (isset($_GET["paged"]) ? $_GET["paged"] : '0');
 
     $ctx = array();
-    $ctx['listing'] = wpgd_govp_get_contribs($_GET["sort"],$_GET['paged'],$perpage);
+    $ctx['listing'] = wpgd_govp_get_contribs(
+        $_GET["sort"], $_GET['paged'], $perpage);
     $ctx['count'] = wpgd_govp_get_contrib_count();
     $ctx['siteurl'] = get_bloginfo('siteurl');
     $ctx['sortby'] = get_query_var("sort");
@@ -150,10 +151,11 @@ function wpgd_update_contrib() {
 }
 add_action('wp_ajax_update_contrib', 'wpgd_update_contrib');
 
+
 function wpgd_insert_contrib() {
     global $wpdb;
-    if(mysql_client_encoding($wpdb->dbh) == 'utf8') {
-        mysql_set_charset( "latin1", $wpdb->dbh );
+    if (mysql_client_encoding($wpdb->dbh) == 'utf8') {
+        mysql_set_charset("latin1", $wpdb->dbh);
     }
     $current_user = wp_get_current_user();
     $ret = $wpdb->insert("contrib",
@@ -164,9 +166,10 @@ function wpgd_insert_contrib() {
                                'user_id' => $current_user->ID,
                                'enabled' => 1,
                                'moderation' => true));
-    mysql_set_charset( "utf8", $wpdb->dbh );
+    mysql_set_charset("utf8", $wpdb->dbh);
     die($ret);
 }
+
 
 function wpgd_delete_contrib() {
     global $wpdb;
@@ -180,7 +183,7 @@ function wpgd_delete_contrib() {
                       array('id' => $id));
     }
 
-    //reparent
+    // reparent
     die($wpdb->update("contrib",
                       array('parent' => 0),
                       array('parent' => $id)));

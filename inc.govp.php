@@ -18,14 +18,14 @@
 function wpgd_govp_get_contribs($sortby, $page, $perpage) {
     $page = (strlen($page) == 0) ?  '0' : $page;
     $offset = $page * $perpage;
-
     $sortfields = array(
-                        'id' => 'c.id' ,
-                        'status' => 'c.status',
-                        'theme' => 'c.theme',
-                        'date'  => 'c.creation_date',
-                        'author' => 'u.display_name',
-                        'title' => 'c.title');
+        'id' => 'c.id' ,
+        'status' => 'c.status',
+        'theme' => 'c.theme',
+        'date'  => 'c.creation_date',
+        'author' => 'u.display_name',
+        'title' => 'c.title'
+    );
     if (isset($sortfields[$sortby])) {
         $sortfield = $sortfields[$sortby];
     } else {
@@ -33,25 +33,28 @@ function wpgd_govp_get_contribs($sortby, $page, $perpage) {
     }
 
     function index_of($arr, $id) {
-        $f = array_filter($arr,
-                          function($x) use ($id) {
-                              return $x['id'] == $id;
-                          });
+        $f = array_filter($arr, function($x) use ($id) {
+            return $x['id'] == $id;
+        });
         return key($f);
     }
 
     global $wpdb;
     $sql = "
-      SELECT c.id, c.title, c.content, c.creation_date, c.theme, c.original, ".
-        " c.status, u.display_name, c.parent, c.moderation, u.ID as user_id ".
-        " FROM contrib c, wp_users u ".
-        " WHERE c.user_id=u.ID AND c.enabled=1 order by $sortfield LIMIT $offset, $perpage";
+      SELECT
+          c.id, c.title, c.content, c.creation_date, c.theme, c.original,
+          c.status, u.display_name, c.parent, c.moderation, u.ID as user_id
+      FROM
+          contrib c, wp_users u
+      WHERE c.user_id=u.ID AND c.enabled=1 order by $sortfield
+          LIMIT $offset, $perpage
+    ";
 
-    if(mysql_client_encoding($wpdb->dbh) == 'utf8') {
-        mysql_set_charset( "latin1", $wpdb->dbh );
+    if (mysql_client_encoding($wpdb->dbh) == 'utf8') {
+        mysql_set_charset("latin1", $wpdb->dbh);
     }
     $results = $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
-    mysql_set_charset( "utf8", $wpdb->dbh );
+    mysql_set_charset("utf8", $wpdb->dbh);
 
     $roots = array();
     $children = array();
@@ -62,6 +65,7 @@ function wpgd_govp_get_contribs($sortby, $page, $perpage) {
             $children[] = $r;
         }
     }
+
     foreach($children as $c) {
         $idx = index_of($roots, $c['parent']);
         array_splice($roots, $idx+1, 0, 'An uninteresting value as markplace');
