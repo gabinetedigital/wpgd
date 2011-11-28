@@ -1,8 +1,53 @@
 <div class="wrap">
   <h2>
-    {{ count }} Contributions
+    Contributions
     <a href="javascript:add_new_contrib()" class="add-new-h2">Add New</a>
   </h2>
+
+  <ul class="subsubsub">
+    <li>
+      <a {% if theme == '' %}class="current"{% endif %}
+         href="{{ pageurl }}&theme=">
+        All <span class="count">({{ total_count }})</span> |
+      </a>
+    </li>
+
+    {% for i in themes %}
+    <li>
+      <a href="{{ pageurl }}&theme={{ i }}"
+         {% if theme == i %}class="current"{% endif %}>
+        {{ i }}
+        <span class="count">({{ themecounts[i] }})</span>
+      </a>
+
+      {% if loop.index != themes|length %}|{% endif %}
+    </li>
+    {% endfor %}
+  </ul>
+
+  <div class="tablenav top">
+    <div class="alignright actions">
+      <label>
+        {% if status == 'true' %}
+        <strong>Approved</strong>
+        {% else %}
+        <a href="{{ pageurl }}&status=true">Approved</a>
+        {% endif %}
+      </label>
+      |
+      <label>
+        {% if status == 'false' %}
+        <strong>Not approved</strong>
+        {% else %}
+        <a href="{{ pageurl }}&status=false">Not approved</a>
+        {% endif %}
+      </label>
+      |
+      <label>
+        <a href="{{ pageurl }}&status=">All</a>
+      </label>
+    </div>
+  </div>
 
   <div class="wpgd-new-contrib stuffbox" style="display:none">
     <form class="form-wrap">

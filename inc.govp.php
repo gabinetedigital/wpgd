@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function wpgd_govp_get_contribs($sortby, $page, $perpage) {
+function wpgd_govp_get_contribs($sortby, $page, $perpage, $theme, $status) {
     $page = (strlen($page) == 0) ?  '0' : $page;
     $offset = $page * $perpage;
     $sortfields = array(
@@ -39,21 +39,41 @@ function wpgd_govp_get_contribs($sortby, $page, $perpage) {
         return key($f);
     }
 
+    $filter = "";
+    $filters = array();
+    if (!empty($theme)) {
+        array_push($filters, "c.theme = '$theme'");
+    }
+    if (!empty($status)) {
+        array_push($filters, "c.status = $status");
+    }
+    if (count($filters) > 0) {
+        $filter = "AND (" . join(" AND ", $filters) . ")";
+    }
+
     global $wpdb;
-    $sql = "
+    $sql_head = "
       SELECT
           c.id, c.title, c.content, c.creation_date, c.theme, c.original,
           c.status, u.display_name, c.parent, c.moderation, u.ID as user_id
+    ";
+
+    $sql_base ="
       FROM
           contrib c, wp_users u
-      WHERE c.user_id=u.ID AND c.enabled=1 order by $sortfield
-          LIMIT $offset, $perpage
+      WHERE
+          (c.user_id=u.ID AND c.enabled=1) $filter
+      ORDER BY $sortfield
     ";
+
+    $sql_main = $sql_head . $sql_base . "LIMIT $offset, $perpage";
+    $sql_count = "SELECT COUNT(c.id) AS total " . $sql_base;
 
     if (mysql_client_encoding($wpdb->dbh) == 'utf8') {
         mysql_set_charset("latin1", $wpdb->dbh);
     }
-    $results = $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+    $results = $wpdb->get_results($wpdb->prepare($sql_main), ARRAY_A);
+    $count = $wpdb->get_var($wpdb->prepare($sql_count));
     mysql_set_charset("utf8", $wpdb->dbh);
 
     $roots = array();
@@ -71,7 +91,11 @@ function wpgd_govp_get_contribs($sortby, $page, $perpage) {
         array_splice($roots, $idx+1, 0, 'An uninteresting value as markplace');
         $roots[$idx+1] = $c;
     }
-    return array_map(function($x) { return (object)$x; },$roots);
+
+    return array(
+        'count' => $count,
+        'listing' => array_map(function($x) { return (object)$x; },$roots)
+    );
 }
 
 
@@ -134,5 +158,16 @@ function wpgd_govp_get_contrib_count_grouped_by_themedate() {
       date(c.creation_date) AS date
     FROM contrib AS c GROUP BY c.theme, date(c.creation_date);";
     return $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+}
+
+
+function wpgd_govp_get_theme_counts() {
+    global $wpdb;
+    $ret = array();
+    $sql = "SELECT COUNT(c.id) count, theme FROM contrib c GROUP BY c.theme";
+    foreach ($wpdb->get_results($wpdb->prepare($sql), ARRAY_A) as $row) {
+        $ret[$row['theme']] = $row['count'];
+    }
+    return $ret;
 }
 ?>

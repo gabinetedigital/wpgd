@@ -19,6 +19,11 @@ include_once('wpgd.templating.php');
 include_once('inc.govp.php');
 include_once('wpgd.pairwise.php');
 
+$themes = array(
+    'cuidado', 'familia', 'emergencia',
+    'medicamentos', 'regional'
+);
+
 add_action('init', function () {
     if (is_admin()) {
         wp_enqueue_script('jquery');
@@ -69,15 +74,41 @@ add_action('admin_menu', function () {
 });
 
 
+function _gen_qstring($defaults) {
+    $data = array();
+    foreach (array('paged', 'theme', 'status', 'sort') as $v) {
+        if (!empty($_GET[$v])) {
+            array_push($data, "$v=" . $_GET[$v]);
+        }
+    }
+
+    foreach($defaults as $k => $v) {
+        $data[$k] = $v;
+    }
+
+    return join("&", $data);
+}
+
+
 function wpgd_govp_main() {
     global $renderer;
+    global $themes;
     $perpage = 50;
     $page = (int) (isset($_GET["paged"]) ? $_GET["paged"] : '0');
 
+    $base_listing = wpgd_govp_get_contribs(
+        $_GET["sort"], $_GET['paged'], $perpage,
+        $_GET['theme'], $_GET['status']
+    );
+
     $ctx = array();
-    $ctx['listing'] = wpgd_govp_get_contribs(
-        $_GET["sort"], $_GET['paged'], $perpage);
-    $ctx['count'] = wpgd_govp_get_contrib_count();
+    $ctx['themes'] = $themes;
+    $ctx['theme'] = $_GET['theme'];
+    $ctx['status'] = $_GET['status'];
+    $ctx['themecounts'] = wpgd_govp_get_theme_counts();
+    $ctx['count'] = $base_listing['count'];
+    $ctx['total_count'] = wpgd_govp_get_contrib_count();
+    $ctx['listing'] = $base_listing['listing'];
     $ctx['siteurl'] = get_bloginfo('siteurl');
     $ctx['sortby'] = get_query_var("sort");
     $ctx['paged'] =  $page;
