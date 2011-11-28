@@ -105,11 +105,9 @@ function wpgd_update_contrib() {
     //backup the original author's contribution before updating it
 
     global $wpdb;
-    if (mysql_client_encoding($wpdb->dbh) == 'utf8') {
-        mysql_set_charset("latin1", $wpdb->dbh);
-    }
-
     $org = wpgd_govp_get_contrib($_POST['data']['id']);
+
+    mysql_set_charset("latin1", $wpdb->dbh);
     switch ($_POST['data']['field']) {
     case 'content':
         if (strlen($org->original) == 0) {
