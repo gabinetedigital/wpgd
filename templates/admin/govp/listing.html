@@ -1,5 +1,8 @@
 <div class="wrap">
-  <h2>{{ count }} Contributions  <a href="javascript:add_new_contrib()" class="add-new-h2">Add New</a></h2>
+  <h2>
+    {{ count }} Contributions
+    <a href="javascript:add_new_contrib()" class="add-new-h2">Add New</a>
+  </h2>
 
   <div class="wpgd-new-contrib stuffbox" style="display:none">
     <form class="form-wrap">
@@ -19,7 +22,8 @@
       </div>
       <div class="form-field">
         <label for="content">Content</label>
-        <textarea name="content" style="width:500px;height:200px" maxlength="600"> </textarea>
+        <textarea name="content" style="width:500px;height:200px"
+                  maxlength="600"> </textarea>
       </div>
     <input type="button" name="OK" class="button" value="OK">
     <input type="button" name="Cancel" class=" button" value="Cancel">
@@ -28,14 +32,16 @@
 
   <div class="wpgd-status-bar">loading...</div>
   <div class="wp-list-table-loading">Loading contributions...</div>
-  <table class="wp-list-table widefat fixed audiences" style="display:none" cellspacing="0">
+  <table class="wp-list-table widefat fixed audiences" style="display:none"
+         cellspacing="0">
     <thead>
       <tr>
         <th style="width:5%"><a href="{{pageurl}}&sort=id">ID</a></th>
         <th style="width:7%"><a href="{{pageurl}}&sort=status">Approved?</a></th>
         <th style="width:8%">Duplicate of</th>
         <th style="width:10%"><a href="{{pageurl}}&sort=theme">Theme</a></th>
-        <th class="column-date" style="width:8%"><a href="{{pageurl}}&sort=date">Creation date</a></th>
+        <th class="column-date" style="width:8%">
+          <a href="{{pageurl}}&sort=date">Creation date</a></th>
         <th style="width:10%"><a href="{{pageurl}}&sort=author">Author</a></th>
         <th style="width:15%"><a href="{{pageurl}}&sort=title">Title</a></th>
         <th>Content</th>
@@ -100,19 +106,44 @@
 
         <td id="contrib-theme[{{contrib.id}}]"
             class="contrib-theme">
-          <select class="wpgd-theme wpgd-the-theme[{{contrib.theme}}]" id="wpgd-theme-id[{{contrib.id}}]" name="theme">
-            <option name="cuidado" {% if contrib.theme  == 'cuidado' %} selected {% endif %}>cuidado</option>
-            <option name="familia"  {% if contrib.theme  == 'familia' %} selected {% endif %}>familia</option>
-            <option name="emergencia"  {% if contrib.theme  == 'emergencia' %} selected {% endif %}>emergencia</option>
-            <option name="medicamentos"  {% if contrib.theme  == 'medicamentos' %} selected {% endif %}>medicamentos</option>
-            <option name="regional"  {% if contrib.theme  == 'regional' %} selected {% endif %}>regional</option>
+          <select
+             class="wpgd-theme wpgd-the-theme[{{contrib.theme}}]"
+             id="wpgd-theme-id[{{contrib.id}}]" name="theme">
+            <option
+               name="cuidado"
+               {% if contrib.theme == 'cuidado' %} selected {% endif %}>
+              cuidado
+            </option>
+            <option
+               name="familia"
+               {% if contrib.theme == 'familia' %} selected {% endif %}>
+              familia
+            </option>
+            <option
+               name="emergencia"
+               {% if contrib.theme == 'emergencia' %} selected {% endif %}>
+              emergencia
+            </option>
+            <option
+               name="medicamentos"
+               {% if contrib.theme == 'medicamentos' %} selected {% endif %}>
+              medicamentos
+            </option>
+            <option
+               name="regional"
+               {% if contrib.theme == 'regional' %} selected {% endif %}>
+              regional
+            </option>
           </select>
         </td>
 
         <td>{{ contrib.creation_date|date("d/m/Y") }}</td>
 
-
-        <td><a href="{{siteurl}}/wp-admin/user-edit.php?user_id={{ contrib.user_id }}"> {{ contrib.display_name }}</td>
+        <td>
+          <a href="{{siteurl}}/wp-admin/user-edit.php?user_id={{ contrib.user_id }}">
+            {{ contrib.display_name }}
+          </a>
+        </td>
 
         <td id="contrib-title[{{contrib.id}}]"
             class="contribution-title">{{ contrib.title }}</td>
