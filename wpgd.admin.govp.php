@@ -17,6 +17,7 @@
 
 include_once('wpgd.templating.php');
 include_once('inc.govp.php');
+include_once('wpgd.pairwise.php');
 
 add_action('init', function () {
     if (is_admin()) {
@@ -127,9 +128,14 @@ function wpgd_update_contrib() {
         break;
 
     case 'status':
-        die($wpdb->update("contrib",
-                          array('status' => !($org->status)),
-                          array('id' => $_POST['data']['id'])));
+        $val = !($org->status);
+        $wpdb->update("contrib",
+                      array('status' => $val),
+                      array('id' => $_POST['data']['id']));
+        if ($val) {
+            die(wpgd_pairwise_send_contrib($org) ? "ok" : "error");
+        }
+        die("ok");
         break;
     case 'parent':
         die($wpdb->update("contrib",
