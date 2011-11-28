@@ -148,19 +148,10 @@
 
         <td>
           {% if contrib.moderation == 0 %}
-          <select class="contrib-parents contrib-parent[{{contrib.parent}}]"
-                  id="contrib-parents[{{contrib.id}}]">
-            <option value="0">None</option>
-            {% for c in listing %}
-              {% if contrib.parent == c.id %}
-              <option value="{{c.id}}" selected>{{c.id}}</option>
-              {% else %}
-                {% if c.id != contrib.id %}
-                <option value="{{c.id}}">{{c.id}}</option>
-                {% endif %}
-              {% endif %}
-            {% endfor %}
-          </select>
+          <input
+             type="text" id="contrib-parents[{{contrib.id}}]"
+             class="contrib-parents contrib-parent[{{contrib.parent}}]"
+             value="{{ contrib.parent|replace({0: 'None'}) }}" style="width:95%">
           {% endif %}
         </td>
 
