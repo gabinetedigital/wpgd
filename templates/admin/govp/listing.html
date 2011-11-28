@@ -25,6 +25,21 @@
     {% endfor %}
   </ul>
 
+
+  <form
+     id="search" method="get" action="{{ pageurl }}"
+     onsubmit="window.location.href+='&s='+document.forms.search.s.value; return false">
+    <p class="search-box">
+      <label class="screen-reader-text" for="search-input">
+        Search Colaborations:
+      </label>
+      <input type="text" id="search_input" name="s" value="{{ s }}">
+      <input
+         type="submit" name="" id="search-submit" class="button"
+         value="Search">
+    </p>
+  </form>
+
   <div class="tablenav top">
     <div class="alignright actions">
       <label>

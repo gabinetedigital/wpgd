@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function wpgd_govp_get_contribs($sortby, $page, $perpage, $theme, $status) {
+function wpgd_govp_get_contribs($sortby, $page, $perpage, $theme, $status, $s) {
     $page = (strlen($page) == 0) ?  '0' : $page;
     $offset = $page * $perpage;
     $sortfields = array(
@@ -39,6 +39,7 @@ function wpgd_govp_get_contribs($sortby, $page, $perpage, $theme, $status) {
         return key($f);
     }
 
+    /* Handling filters */
     $filter = "";
     $filters = array();
     if (!empty($theme)) {
@@ -49,6 +50,13 @@ function wpgd_govp_get_contribs($sortby, $page, $perpage, $theme, $status) {
     }
     if (count($filters) > 0) {
         $filter = "AND (" . join(" AND ", $filters) . ")";
+    }
+
+    /* Handling the text search */
+    $search = "";
+    if (!empty($_GET['s'])) {
+        $s = '%%' . $_GET['s'] . '%%';
+        $search = "AND (title LIKE '$s' OR content LIKE '$s')";
     }
 
     global $wpdb;
@@ -62,7 +70,7 @@ function wpgd_govp_get_contribs($sortby, $page, $perpage, $theme, $status) {
       FROM
           contrib c, wp_users u
       WHERE
-          (c.user_id=u.ID AND c.enabled=1) $filter
+          (c.user_id=u.ID AND c.enabled=1) $filter $search
       ORDER BY $sortfield
     ";
 

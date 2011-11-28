@@ -98,11 +98,12 @@ function wpgd_govp_main() {
 
     $base_listing = wpgd_govp_get_contribs(
         $_GET["sort"], $_GET['paged'], $perpage,
-        $_GET['theme'], $_GET['status']
+        $_GET['theme'], $_GET['status'], $_GET['s']
     );
 
     $ctx = array();
     $ctx['themes'] = $themes;
+    $ctx['s'] = $_GET['s'];
     $ctx['theme'] = $_GET['theme'];
     $ctx['status'] = $_GET['status'];
     $ctx['themecounts'] = wpgd_govp_get_theme_counts();
