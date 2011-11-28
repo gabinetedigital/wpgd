@@ -305,4 +305,7 @@ jQuery(function() {
         self.val(parent);
       }
   });
+
+  $(".wp-list-table").show();
+  $(".wp-list-table-loading").hide();
 });
