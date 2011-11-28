@@ -5,6 +5,17 @@ function add_new_contrib() {
 jQuery(function() {
   var $ = jQuery;
 
+  function reduce(arr,fn) {
+    var ret = $([]);
+    for(var i = 0; i < arr.length; i++) {
+      var x = $(arr[i]);
+      if (fn(x))  {
+        ret = ret.add(x);
+      }
+    }
+    return ret;
+  }
+
   //form to insert contribution
   $(".wpgd-new-contrib input[name=Cancel]").click(
     function() { $(".wpgd-new-contrib").hide()});
@@ -28,10 +39,16 @@ jQuery(function() {
   });
 
   //delete contrib
-  $(".delete-contrib").click(function(ev) {
+  reduce($(".delete-contrib"), function(x) {
+    return is_approved(x.attr("href"));
+  }).hide();
+
+  reduce($(".delete-contrib"), function(x) {
+    return !is_approved(x.attr("href"));
+  }).click(function(ev) {
     ev.preventDefault();
+    var id = $(this).attr("href");
     if (confirm("Are you sure you want to delete?")) {
-      var id = $(this).attr("href");
       if ($(".child-of-"+id).length > 0) {
         alert("Unassociate children before removing this");
         return;
@@ -51,7 +68,15 @@ jQuery(function() {
     }
   });
 
-  $(".wpgd-theme").change(function() {
+  //careful: the form has a .wpgd-theme too!
+  reduce($(".wp-list-table .wpgd-theme"), function(x) {
+    var id = /\[([0-9]+)\]/.exec(x.attr("id"))[1];
+    return is_approved(id);
+  }).each(function() {
+    $(this).replaceWith("<span>"+$(this).val()+"</span>")
+  });
+
+  $(".wp-list-table .wpgd-theme").change(function() {
     var self = $(this);
     var id = /\[([0-9]+)\]/.exec(self.attr("id"))[1];
     var current = /wpgd-the-theme\[([a-zA-Z]+)\]/.exec(self.attr("class"))[1];
@@ -88,6 +113,14 @@ jQuery(function() {
 
   function is_child(id) {
     return $("#row-"+id).hasClass("is-child");
+  }
+
+  function is_parent(id) {
+    return !is_child(id);
+  }
+
+  function is_approved(id) {
+    return $("#row-"+id).hasClass('wpgd-approved');
   }
 
   function move_parent_row(id) {
@@ -172,19 +205,34 @@ jQuery(function() {
       $("<input type='text'/>")));
 
 
+  reduce($(".contrib-status input"), function(x) {
+    var td = x.parent();
+    var tr = td.parent();
+    var id = /\[([0-9]+)\]/.exec(td.attr("id"))[1];
+    return is_approved(id)
+  }).hide();
+
   $(".contrib-status input").change(function() {
     var td = $(this).parent();
     var tr = td.parent();
     var id = /\[([0-9]+)\]/.exec(td.attr("id"))[1];
     var data = {id:id,field:'status'};
+    if (!confirm("Are you sure? There is no way to" +
+                 " disapprove the contribution latter")) {
+      $(this).attr("checked",false);
+      return;
+    }
+    $(this).hide();
     slow_operation(function(done) {
       $.ajax({
         url: 'admin-ajax.php',
         type: 'post',
         data: {action:'update_contrib',data:data},
-        success: function() {
+        success: function(data) {
+          if (data == 'error') alert("There was an error approving "+ id);
           done();
           tr.toggleClass("wpgd-approved wpgd-disapproved");
+          window.location.reload();
         }
       });
     });
@@ -192,6 +240,13 @@ jQuery(function() {
 
 
   //re-parenting events
+  reduce($(".contrib-parents"), function(x) {
+    var id = /\[([0-9]+)\]/.exec(x.attr("id"))[1];
+    return is_approved(id);
+  }).each(function() {
+    $(this).replaceWith("<span></span>")
+  });
+
   $(".contrib-parents").change(function() {
     var self = $(this);
     var id = /\[([0-9]+)\]/.exec(self.attr("id"))[1];
