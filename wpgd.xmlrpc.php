@@ -40,6 +40,13 @@ function _wpgd_method_header(&$args) {
 }
 
 
+/**
+ * A wrapper for the function that lists all highlighted videos
+ *
+ * @param array $args Holds parameters to be passed to the actuall
+ *  function being wrapped and, in this case, you can pass the number of
+ *  highlights you want.
+ */
 function wpgd_getHighlightedVideos($args) {
     if (!is_array($args = _wpgd_method_header($args))) {
         return $args;
@@ -51,11 +58,10 @@ function wpgd_getHighlightedVideos($args) {
 }
 
 
-function wpgd_register_methods($methods) {
+/* Filter that registers our methods in the wordpress xmlrpc provider */
+add_filter('xmlrpc_methods', function ($methods) {
     $methods['wpgd.getHighlightedVideos'] = 'wpgd_getHighlightedVideos';
     return $methods;
-}
-
-add_filter('xmlrpc_methods', 'wpgd_register_methods');
+});
 
 ?>
