@@ -16,7 +16,7 @@
  */
 
 
-function wpgd_videos_get_videos($where=null, $orderby=null, $limit=null) {
+function wpgd_videos_get_videos($where=null, $orderby=null, $limit=null, $offset=null) {
     global $wpdb;
     $videos = $wpdb->prefix . "wpgd_admin_videos";
     $sql = "
@@ -29,7 +29,9 @@ function wpgd_videos_get_videos($where=null, $orderby=null, $limit=null) {
     if (isset($orderby))
         $sql .= "ORDER BY $orderby ";
     if (isset($limit))
-        $sql .= "LIMIT $limit";
+        $sql .= "LIMIT $limit ";
+    if (isset($offset))
+        $sql .= "OFFSET $offset ";
     return $wpdb->get_results($wpdb->prepare($sql));
 }
 
