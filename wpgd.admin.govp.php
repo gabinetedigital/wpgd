@@ -204,6 +204,10 @@ function wpgd_insert_contrib() {
         mysql_set_charset("latin1", $wpdb->dbh);
     }
     $current_user = wp_get_current_user();
+
+    $status = $_POST['data']['part'] == "0" ||
+        strlen(trim($_POST['data']['part'])) == 0? 0 : 1;
+
     $ret = $wpdb->insert("contrib",
                          array('parent' => 0,
                                'theme' => $_POST['data']['theme'],
@@ -212,6 +216,7 @@ function wpgd_insert_contrib() {
                                'user_id' => $current_user->ID,
                                'part' => $_POST['data']['part'],
                                'enabled' => 1,
+                               'status' => $status,
                                'moderation' => true));
     mysql_set_charset("utf8", $wpdb->dbh);
     die($ret);
