@@ -173,6 +173,20 @@ function wpgd_update_contrib() {
                           array('parent' => $_POST['data']['parent']),
                           array('id' => $_POST['data']['id'])));
         break;
+    case 'part':
+        $res = "ok";
+        if ($org->status == 0) {
+            $wpdb->update("contrib",
+                          array('status' => 1),
+                          array('id' => $_POST['data']['id']));
+            $res = wpgd_pairwise_send_contrib($org) ? "ok" : "error";
+
+        }
+        $wpdb->update("contrib",
+                          array('part' => $_POST['data']['part']),
+                      array('id' => $_POST['data']['id']));
+        die($res);
+        break;
     case 'theme':
         die($wpdb->update("contrib",
                           array('theme' => $_POST['data']['theme']),
@@ -196,6 +210,7 @@ function wpgd_insert_contrib() {
                                'title' => $_POST['data']['title'],
                                'content' => $_POST['data']['content'],
                                'user_id' => $current_user->ID,
+                               'part' => $_POST['data']['part'],
                                'enabled' => 1,
                                'moderation' => true));
     mysql_set_charset("utf8", $wpdb->dbh);
@@ -215,10 +230,15 @@ function wpgd_delete_contrib() {
                       array('id' => $id));
     }
 
-    // reparent
+    // reset parent
+    $wpdb->update("contrib",
+                  array('parent' => 0),
+                  array('parent' => $id));
+
+    // reset parts
     die($wpdb->update("contrib",
-                      array('parent' => 0),
-                      array('parent' => $id)));
+                      array('part' => 0),
+                      array('part' => $id)));
 
 }
 

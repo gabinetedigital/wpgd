@@ -22,14 +22,21 @@ jQuery(function() {
 
   $(".wpgd-new-contrib input[name=OK]").click(function() {
     var theme = $(".wpgd-new-contrib select").val();
-    var title = $(".wpgd-new-contrib input[type=text]").attr("value");
+    var title = $(".wpgd-new-contrib input[name=title]").attr("value");
     var content = $(".wpgd-new-contrib textarea").val();
+    var part = $(".wpgd-new-contrib input[name=part]").attr("value");
+    if ((part.length > 0) && !confirm("This contribution (as a part) will be automatically approved,"+
+                                     " and approved contributions cannot be removed."+
+                                      " Confirm?")) {
+      $(".wpgd-new-contrib").hide();
+      return;
+    }
     slow_operation(function(done) {
       $.ajax({
         url: 'admin-ajax.php',
         type: 'post',
         data: {action:'insert_contrib',
-               data:{theme:theme,title:title,content:content}},
+               data:{theme:theme,title:title,content:content, part:part}},
         success: function(data) {
           done();
           window.location.reload();
@@ -120,7 +127,7 @@ jQuery(function() {
   }
 
   function is_approved(id) {
-    return $("#row-"+id).hasClass('wpgd-approved');
+    return $("#row-"+id).hasClass('wpgd-approved') || $("#row-"+id).hasClass('wpgd-part-approved');
   }
 
   function move_parent_row(id) {
@@ -205,12 +212,22 @@ jQuery(function() {
       $("<input type='text'/>")));
 
 
+  //hiding checkboxes of approved contribs
   reduce($(".contrib-status input"), function(x) {
     var td = x.parent();
     var tr = td.parent();
     var id = /\[([0-9]+)\]/.exec(td.attr("id"))[1];
     return is_approved(id)
   }).hide();
+
+  //hiding duplicate field of approved contribs
+  reduce($(".contrib-duplicates"), function(x) {
+    var id = /\[([0-9]+)\]/.exec(x.attr("id"))[1];
+    return is_approved(id);
+  }).each(function() {
+    $(this).replaceWith("<span></span>")
+  });
+
 
   $(".contrib-status input").change(function() {
     var td = $(this).parent();
@@ -238,72 +255,124 @@ jQuery(function() {
     });
   });
 
-
-  //re-parenting events
-  reduce($(".contrib-parents"), function(x) {
-    var id = /\[([0-9]+)\]/.exec(x.attr("id"))[1];
-    return is_approved(id);
-  }).each(function() {
-    $(this).replaceWith("<span></span>")
-  });
-
-  $(".contrib-parents").change(function() {
+  $(".contrib-parts").change(function() {
     var self = $(this);
     var id = /\[([0-9]+)\]/.exec(self.attr("id"))[1];
-    var parent = /contrib-parent\[([0-9]+)\]/.exec(self.attr("class"))[1];
+    var parent = /contrib-part\[([0-9]+)\]/.exec(self.attr("class"))[1];
     var new_parent = self.val();
     if (is_child(new_parent)) {
-      alert("Can't be a child of a child")
+      alert("Can't be a part of a part");
       self.val(parent);
       return;
     }
-    if (parent != self.val())
-      if (confirm("Confirm change?")) {
-        var data = {id:id,field:'parent', parent:new_parent};
-        slow_operation(function(done) {
-          $.ajax({
-            url: 'admin-ajax.php',
-            type: 'post',
-            data: {action:'update_contrib',data:data},
-            success: function() {
-              done();
-              var tr = $("#row-"+id);
-              if (new_parent == 0) {
-                move_parent_row(id);
-                //show input checkbox
-                tr.find("input[type=checkbox]").show();
-                //hide span arrow
-                tr.find("span").hide();
-                //put the apro/disapr class back
-                if($("#row-"+id+" input[type=checkbox]").is(":checked")) {
-                  tr.addClass("wpgd-approved");
-                } else {
-                  tr.addClass("wpgd-disapproved");
-                }
-                tr.removeClass("child-of-"+parent);
-                tr.removeClass("is-child");
-              } else {
-                tr.removeClass("child-of-"+parent);
-                tr.addClass("child-of-"+new_parent);
-                tr.addClass("is-child");
-                //arrange it below the parent
-                $("#row-"+new_parent).after(tr.detach());
-                //remove the approved/disapproved class
-                tr.removeClass("wpgd-approved wpgd-disapproved");
-                //hide the checkbox
-                tr.find("input[type=checkbox]").hide();
-                //show span arrow
-                tr.find("span").show();
-              }
-              //update id info
-              self.removeClass("contrib-parent["+parent+"]");
-              self.addClass("contrib-parent["+new_parent+"]");
+
+    if (new_parent != 0 && $("#row-"+new_parent).length == 0) {
+      alert("Can't find contrib with ID = " + new_parent);
+      self.val(parent);
+      return;
+    }
+
+    if (id == new_parent) {
+      alert("Can't be part of itself");
+      self.val(parent);
+      return;
+    }
+
+    if (parent == new_parent) return;
+
+    if (!confirm("Confirm change? This contribution will be approved and there is not way to revert!")) {
+      self.val(parent);
+      return;
+    }
+
+    var data = {id:id,field:'part', part:new_parent};
+    slow_operation(function(done) {
+      $.ajax({
+        url: 'admin-ajax.php',
+        type: 'post',
+        data: {action:'update_contrib',data:data},
+        success: function(data) {
+          done();
+          if (data == 'error') alert("There was an error approving "+ id);
+          window.location.reload();
+        }
+      });
+    });
+  });
+
+  $(".contrib-duplicates").change(function() {
+    var self = $(this);
+    var id = /\[([0-9]+)\]/.exec(self.attr("id"))[1];
+    var parent = /contrib-duplicate\[([0-9]+)\]/.exec(self.attr("class"))[1];
+    var new_parent = self.val();
+
+    if (is_child(new_parent)) {
+      alert("Can't be a duplicated of a duplicated")
+      self.val(parent);
+      return;
+    }
+
+    if (new_parent != 0 && $("#row-"+new_parent).length == 0) {
+      alert("Can't find contrib with ID = " + new_parent);
+      self.val(parent);
+      return;
+    }
+
+    if (id == new_parent) {
+      alert("Can't be duplicated of itself");
+      self.val(parent);
+      return;
+    }
+
+    if (parent == self.val()) return;
+
+    if (!confirm("Confirm change?")) {
+      self.val(parent);
+      return;
+    }
+
+    var data = {id:id,field:'parent', parent:new_parent};
+    slow_operation(function(done) {
+      $.ajax({
+        url: 'admin-ajax.php',
+        type: 'post',
+        data: {action:'update_contrib',data:data},
+        success: function() {
+          done();
+          var tr = $("#row-"+id);
+          if (new_parent == 0) {
+            move_parent_row(id);
+            //show input checkbox
+            tr.find("input[type=checkbox]").show();
+            //hide span arrow
+            tr.find("span").hide();
+            //put the apro/disapr class back
+            if($("#row-"+id+" input[type=checkbox]").is(":checked")) {
+              tr.addClass("wpgd-approved");
+            } else {
+              tr.addClass("wpgd-disapproved");
             }
-          });
-        });
-      } else {
-        self.val(parent);
-      }
+            tr.removeClass("child-of-"+parent);
+            tr.removeClass("is-duplicate");
+          } else {
+            tr.removeClass("duplicate-of-"+parent);
+            tr.addClass("duplicate-of-"+new_parent);
+            tr.addClass("is-duplicate");
+            //arrange it below the parent
+            $("#row-"+new_parent).after(tr.detach());
+            //remove the approved/disapproved class
+            tr.removeClass("wpgd-approved wpgd-disapproved");
+            //hide the checkbox
+            tr.find("input[type=checkbox]").hide();
+            //show span arrow
+            tr.find("span").show();
+          }
+          //update id info
+          self.removeClass("contrib-duplicate["+parent+"]");
+          self.addClass("contrib-duplicate["+new_parent+"]");
+        }
+      });
+    });
   });
 
   $(".wp-list-table").show();

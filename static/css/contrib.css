@@ -11,6 +11,10 @@
     background-color:#FFE6E6;
 }
 
+.wpgd-part-approved {
+    background-color:#A9FFD1;
+}
+
 .wpgd-status-bar {
     position:fixed;
     right: 10px;

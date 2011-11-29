@@ -85,6 +85,10 @@
         <textarea name="content" style="width:500px;height:200px"
                   maxlength="600"> </textarea>
       </div>
+      <div class="form-field">
+        <label for="part">Part of</label>
+        <input type="text" name="part" style="width:518px">
+      </div>
     <input type="button" name="OK" class="button" value="OK">
     <input type="button" name="Cancel" class=" button" value="Cancel">
     </form>
@@ -98,7 +102,8 @@
       <tr>
         <th style="width:5%"><a href="{{pageurl}}&sort=id">ID</a></th>
         <th style="width:7%"><a href="{{pageurl}}&sort=status">Approved?</a></th>
-        <th style="width:8%">Duplicate of</th>
+        <th style="width:8%">Duplicate</th>
+        <th style="width:8%">Part of</th>
         <th style="width:10%"><a href="{{pageurl}}&sort=theme">Theme</a></th>
         <th class="column-date" style="width:8%">
           <a href="{{pageurl}}&sort=date">Creation date</a></th>
@@ -110,20 +115,30 @@
     <tbody id="contrib-rows">
       {% for contrib in listing %}
 
-        {% if contrib.parent != 0 %}
-          {% set apr = "" %}
+        {% if (contrib.parent != 0) or (contrib.part != 0) %}
+          {% if contrib.part != 0 %}
+           {% set apr = "wpgd-part-approved" %}
+          {% else %}
+           {% set apr = "" %}
+          {% endif %}
         {% else %}
+          {% set apr = "" %}
           {% if contrib.status == 1 %}
            {% set apr = "wpgd-approved" %}
-          {% else %}
+          {% endif %}
+          {% if contrib.status == 0 %}
            {% set apr = "wpgd-disapproved" %}
           {% endif %}
         {% endif %}
 
-        {% if contrib.parent == 0 %}
+        {% if (contrib.parent == 0) and (contrib.part == 0) %}
          {% set prt = "" %}
         {% else %}
-         {% set prt = "is-child child-of-" ~ contrib.parent %}
+          {% if (contrib.parent == 0) %}
+            {% set prt = "is-duplicate duplicate-of-" ~ contrib.parent %}
+          {% else %}
+            {% set prt = "is-part part-of-" ~ contrib.part %}
+          {% endif %}
         {% endif %}
       <tr class="{{apr}} {{prt}}" id="row-{{ contrib.id }}">
 
@@ -149,10 +164,17 @@
         <td>
           {% if contrib.moderation == 0 %}
           <input
-             type="text" id="contrib-parents[{{contrib.id}}]"
-             class="contrib-parents contrib-parent[{{contrib.parent}}]"
-             value="{{ contrib.parent|replace({0: 'None'}) }}" style="width:95%">
+             type="text" id="contrib-duplicate[{{contrib.id}}]"
+             class="contrib-duplicates contrib-duplicate[{{contrib.parent}}]"
+             value="{{ contrib.parent }}" style="width:95%">
           {% endif %}
+        </td>
+
+        <td>
+          <input
+             type="text" id="contrib-part[{{contrib.id}}]"
+             class="contrib-parts contrib-part[{{contrib.part}}]"
+             value="{{ contrib.part }}" style="width:95%">
         </td>
 
         <td id="contrib-theme[{{contrib.id}}]"
@@ -209,6 +231,7 @@
         <th classs="manage-column sortable desc" scope="col">ID</th>
         <th classs="manage-column sortable desc" scope="col">Approved?</th>
         <th classs="manage-column sortable desc" scope="col">Duplicate of</th>
+        <th classs="manage-column sortable desc" scope="col">Part of</th>
         <th classs="manage-column sortable asc" scope="col">Theme</th>
         <th classs="manage-column sortable desc" scope="col">Creation Date</th>
         <th classs="manage-column sortable desc" scope="col">Author</th>

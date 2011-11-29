@@ -36,7 +36,11 @@ function wpgd_govp_get_contribs($sortby, $page, $perpage, $theme, $status, $s) {
         $f = array_filter($arr, function($x) use ($id) {
             return $x['id'] == $id;
         });
-        return key($f);
+        if (count($f) == 0) {
+            return -1;
+        } else {
+            return key($f);
+        }
     }
 
     /* Handling filters */
@@ -63,7 +67,7 @@ function wpgd_govp_get_contribs($sortby, $page, $perpage, $theme, $status, $s) {
     $sql_head = "
       SELECT
           c.id, c.title, c.content, c.creation_date, c.theme, c.original,
-          c.status, u.display_name, c.parent, c.moderation, u.ID as user_id
+          c.status, u.display_name, c.parent, c.part, c.moderation, u.ID as user_id
     ";
 
     $sql_base ="
@@ -87,7 +91,8 @@ function wpgd_govp_get_contribs($sortby, $page, $perpage, $theme, $status, $s) {
     $roots = array();
     $children = array();
     foreach ($results as $r) {
-        if ($r['parent'] == 0) {
+        $r['has_parts'] = 0;
+        if (($r['parent'] == 0) && ($r['part'] == 0)) {
             $roots[] = $r;
         } else {
             $children[] = $r;
@@ -96,6 +101,12 @@ function wpgd_govp_get_contribs($sortby, $page, $perpage, $theme, $status, $s) {
 
     foreach($children as $c) {
         $idx = index_of($roots, $c['parent']);
+        if ($idx == -1) {
+            $idx = index_of($roots, $c['part']);
+            if (isset($roots[$idx]) ) {
+                    $roots[$idx]['has_parts'] = 1;
+            }
+        }
         array_splice($roots, $idx+1, 0, 'An uninteresting value as markplace');
         $roots[$idx+1] = $c;
     }
@@ -111,7 +122,7 @@ function wpgd_govp_get_contrib($id) {
     global $wpdb;
     $sql = "
       SELECT c.id, c.title, c.content, c.creation_date, c.theme, c.original, ".
-      " c.status, u.display_name, c.parent, c.moderation ".
+      " c.status, u.display_name, c.parent, c.part, c.moderation ".
       " FROM contrib c, wp_users u ".
       " WHERE c.user_id=u.ID AND c.enabled=true AND c.id=%d";
 
