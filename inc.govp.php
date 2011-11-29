@@ -129,10 +129,10 @@ function wpgd_govp_get_contrib($id) {
     if(mysql_client_encoding($wpdb->dbh) == 'utf8') {
         mysql_set_charset( "latin1", $wpdb->dbh );
     }
-    $ret = array_pop($wpdb->get_results($wpdb->prepare($sql,array($id))));
+    $res = $wpdb->get_results($wpdb->prepare($sql,array($id)));
     mysql_set_charset( "utf8", $wpdb->dbh );
 
-    return $ret;
+    return count($res) == 1 ? $res[0] : null;
 }
 
 

@@ -25,12 +25,6 @@ jQuery(function() {
     var title = $(".wpgd-new-contrib input[name=title]").attr("value");
     var content = $(".wpgd-new-contrib textarea").val();
     var part = $(".wpgd-new-contrib input[name=part]").attr("value");
-    if ((part.length > 0) && !confirm("This contribution (as a part) will be automatically approved,"+
-                                     " and approved contributions cannot be removed."+
-                                      " Confirm?")) {
-      $(".wpgd-new-contrib").hide();
-      return;
-    }
     slow_operation(function(done) {
       $.ajax({
         url: 'admin-ajax.php',
@@ -112,7 +106,6 @@ jQuery(function() {
     fn(function() { $(".wpgd-status-bar").slideUp(); });
   }
 
-
   //useful functions...
   function get_row_id(tr) {
     return parseInt(tr.attr("id").split("-")[1]);
@@ -127,7 +120,7 @@ jQuery(function() {
   }
 
   function is_approved(id) {
-    return $("#row-"+id).hasClass('wpgd-approved') || $("#row-"+id).hasClass('wpgd-part-approved');
+    return $("#row-"+id).hasClass('wpgd-approved');
   }
 
   function move_parent_row(id) {
@@ -248,7 +241,6 @@ jQuery(function() {
         success: function(data) {
           if (data == 'error') alert("There was an error approving "+ id);
           done();
-          tr.toggleClass("wpgd-approved wpgd-disapproved");
           window.location.reload();
         }
       });
@@ -266,11 +258,11 @@ jQuery(function() {
       return;
     }
 
-    if (new_parent != 0 && $("#row-"+new_parent).length == 0) {
-      alert("Can't find contrib with ID = " + new_parent);
-      self.val(parent);
-      return;
-    }
+    // if (new_parent != 0 && $("#row-"+new_parent).length == 0) {
+    //   alert("Can't find contrib with ID = " + new_parent);
+    //   self.val(parent);
+    //   return;
+    // }
 
     if (id == new_parent) {
       alert("Can't be part of itself");
@@ -280,7 +272,7 @@ jQuery(function() {
 
     if (parent == new_parent) return;
 
-    if (!confirm("Confirm change? This contribution will be approved and there is not way to revert!")) {
+    if (!confirm("Confirm change?")) {
       self.val(parent);
       return;
     }
@@ -291,10 +283,14 @@ jQuery(function() {
         url: 'admin-ajax.php',
         type: 'post',
         data: {action:'update_contrib',data:data},
-        success: function(data) {
+        success: function(res) {
           done();
-          if (data == 'error') alert("There was an error approving "+ id);
-          window.location.reload();
+          if (res == 'not-found') {
+            alert("Contribution " + id + " not found");
+            self.val(parent);
+          } else {
+            window.location.reload();
+          }
         }
       });
     });
@@ -312,11 +308,11 @@ jQuery(function() {
       return;
     }
 
-    if (new_parent != 0 && $("#row-"+new_parent).length == 0) {
-      alert("Can't find contrib with ID = " + new_parent);
-      self.val(parent);
-      return;
-    }
+    // if (new_parent != 0 && $("#row-"+new_parent).length == 0) {
+    //   alert("Can't find contrib with ID = " + new_parent);
+    //   self.val(parent);
+    //   return;
+    // }
 
     if (id == new_parent) {
       alert("Can't be duplicated of itself");
@@ -337,39 +333,14 @@ jQuery(function() {
         url: 'admin-ajax.php',
         type: 'post',
         data: {action:'update_contrib',data:data},
-        success: function() {
+        success: function(res) {
           done();
-          var tr = $("#row-"+id);
-          if (new_parent == 0) {
-            move_parent_row(id);
-            //show input checkbox
-            tr.find("input[type=checkbox]").show();
-            //hide span arrow
-            tr.find("span").hide();
-            //put the apro/disapr class back
-            if($("#row-"+id+" input[type=checkbox]").is(":checked")) {
-              tr.addClass("wpgd-approved");
-            } else {
-              tr.addClass("wpgd-disapproved");
-            }
-            tr.removeClass("child-of-"+parent);
-            tr.removeClass("is-duplicate");
+          self.val(parent);
+          if (res == 'not-found') {
+            alert("Contribution " + id + " not found");
           } else {
-            tr.removeClass("duplicate-of-"+parent);
-            tr.addClass("duplicate-of-"+new_parent);
-            tr.addClass("is-duplicate");
-            //arrange it below the parent
-            $("#row-"+new_parent).after(tr.detach());
-            //remove the approved/disapproved class
-            tr.removeClass("wpgd-approved wpgd-disapproved");
-            //hide the checkbox
-            tr.find("input[type=checkbox]").hide();
-            //show span arrow
-            tr.find("span").show();
+            window.location.reload();
           }
-          //update id info
-          self.removeClass("contrib-duplicate["+parent+"]");
-          self.addClass("contrib-duplicate["+new_parent+"]");
         }
       });
     });

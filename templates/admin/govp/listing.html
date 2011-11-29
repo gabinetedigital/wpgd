@@ -115,21 +115,23 @@
     <tbody id="contrib-rows">
       {% for contrib in listing %}
 
-        {% if (contrib.parent != 0) or (contrib.part != 0) %}
-          {% if contrib.part != 0 %}
-           {% set apr = "wpgd-part-approved" %}
-          {% else %}
-           {% set apr = "" %}
-          {% endif %}
+      {% set apr = "" %}
+      {% set bg = "" %}
+      {% if contrib.parent == 0 %}
+        {% if contrib.status == 1 %}
+         {% set apr = "wpgd-approved" %}
+         {% set bg = "wpgd-approved-bg" %}
         {% else %}
-          {% set apr = "" %}
-          {% if contrib.status == 1 %}
-           {% set apr = "wpgd-approved" %}
-          {% endif %}
-          {% if contrib.status == 0 %}
-           {% set apr = "wpgd-disapproved" %}
-          {% endif %}
+         {% set apr = "wpgd-disapproved" %}
+         {% set bg = "wpgd-disapproved-bg" %}
         {% endif %}
+      {% endif %}
+
+      {% if contrib.part != 0 %}
+        {% set apr = apr ~ " wpgd-part wpgd-part-bg" %}
+      {% else %}
+        {% set apr = apr ~ " " ~ bg %}
+      {% endif %}
 
         {% if (contrib.parent == 0) and (contrib.part == 0) %}
          {% set prt = "" %}

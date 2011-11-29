@@ -169,23 +169,28 @@ function wpgd_update_contrib() {
         die("ok");
         break;
     case 'parent':
+        if ($_POST['data']['parent'] != "0") {
+            $parent = wpgd_govp_get_contrib($_POST['data']['parent']);
+
+            if ($parent == null) {
+                die("not-found");
+            }
+        }
         die($wpdb->update("contrib",
                           array('parent' => $_POST['data']['parent']),
                           array('id' => $_POST['data']['id'])));
         break;
     case 'part':
-        $res = "ok";
-        if ($org->status == 0) {
-            $wpdb->update("contrib",
-                          array('status' => 1),
-                          array('id' => $_POST['data']['id']));
-            $res = wpgd_pairwise_send_contrib($org) ? "ok" : "error";
+        if ($_POST['data']['part'] != "0") {
+            $part = wpgd_govp_get_contrib($_POST['data']['part']);
 
+            if ($part == null) {
+                die("not-found");
+            }
         }
-        $wpdb->update("contrib",
+        die($wpdb->update("contrib",
                           array('part' => $_POST['data']['part']),
-                      array('id' => $_POST['data']['id']));
-        die($res);
+                          array('id' => $_POST['data']['id'])));
         break;
     case 'theme':
         die($wpdb->update("contrib",
@@ -205,9 +210,6 @@ function wpgd_insert_contrib() {
     }
     $current_user = wp_get_current_user();
 
-    $status = $_POST['data']['part'] == "0" ||
-        strlen(trim($_POST['data']['part'])) == 0? 0 : 1;
-
     $ret = $wpdb->insert("contrib",
                          array('parent' => 0,
                                'theme' => $_POST['data']['theme'],
@@ -216,7 +218,7 @@ function wpgd_insert_contrib() {
                                'user_id' => $current_user->ID,
                                'part' => $_POST['data']['part'],
                                'enabled' => 1,
-                               'status' => $status,
+                               'status' => 0,
                                'moderation' => true));
     mysql_set_charset("utf8", $wpdb->dbh);
     die($ret);
