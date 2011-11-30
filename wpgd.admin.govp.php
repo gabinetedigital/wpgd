@@ -91,7 +91,8 @@ function wpgd__gen_qstring($defaults) {
     return join("&", $data);
 }
 
-function wpgd__get_contribs($page) {
+//returns sorted contributions to render on the html table
+function wpgd__sorted_contribs($page) {
     list($contribs, $count) = wpgd_db_get_contribs(
         $_GET["sort"], $page, WPGD_CONTRIBS_PER_PAGE,
         $_GET['theme'], $_GET['status'], $_GET['s']
@@ -129,7 +130,7 @@ function wpgd_govp_main() {
 
     $ctx = array();
 
-    list($ctx['listing'], $ctx['count']) =  wpgd__get_contribs($page-1);
+    list($ctx['listing'], $ctx['count']) = wpgd__sorted_contribs($page-1);
 
     $ctx['themes'] = $themes;
     $ctx['s'] = $_GET['s'];
