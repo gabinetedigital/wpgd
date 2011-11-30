@@ -200,7 +200,6 @@ function wpgd_update_contrib() {
     }
     mysql_set_charset("utf8", $wpdb->dbh);
 }
-add_action('wp_ajax_update_contrib', 'wpgd_update_contrib');
 
 
 function wpgd_insert_contrib() {
@@ -250,5 +249,6 @@ function wpgd_delete_contrib() {
 }
 
 add_action('wp_ajax_insert_contrib', 'wpgd_insert_contrib');
+add_action('wp_ajax_update_contrib', 'wpgd_update_contrib');
 add_action('wp_ajax_delete_contrib', 'wpgd_delete_contrib');
 ?>
