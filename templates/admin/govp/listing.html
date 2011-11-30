@@ -242,13 +242,13 @@
       </tr>
     </tfoot>
   </table>
-  {% if paged > 0 %}
+  {% if paged > 1 %}
   <a href="{{pageurl}}&paged={{paged-1}}">previous</a>
   {% else %}
   previous
   {% endif %}
-  ({{paged+1}}/{{numpages}})
-  {% if count / perpage >  (paged+1) %}
+  ({{paged}}/{{numpages}})
+  {% if numpages >  (paged) %}
     <a href="{{pageurl}}&paged={{paged+1}}">next</a>
   {% else %}
     next

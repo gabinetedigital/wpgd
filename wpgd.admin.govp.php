@@ -125,11 +125,11 @@ function wpgd__get_contribs($page) {
 function wpgd_govp_main() {
     global $renderer;
     global $themes;
-    $page = (int) (isset($_GET["paged"]) ? $_GET["paged"] : '0');
+    $page = (int) (isset($_GET["paged"]) ? $_GET["paged"] : '1');
 
     $ctx = array();
 
-    list($ctx['listing'], $ctx['count']) =  wpgd__get_contribs($page);
+    list($ctx['listing'], $ctx['count']) =  wpgd__get_contribs($page-1);
 
     $ctx['themes'] = $themes;
     $ctx['s'] = $_GET['s'];
