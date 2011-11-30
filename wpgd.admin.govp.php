@@ -16,7 +16,7 @@
  */
 
 include_once('wpgd.templating.php');
-include_once('inc.govp.php');
+include_once('wpgd.db.govp.php');
 include_once('wpgd.pairwise.php');
 
 $themes = array(

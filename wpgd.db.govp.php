@@ -118,7 +118,7 @@ function wpgd_govp_get_contribs($sortby, $page, $perpage, $theme, $status, $s) {
 }
 
 
-function wpgd_govp_get_contrib($id) {
+function wpgd_db_get_contrib($id) {
     global $wpdb;
     $sql = "
       SELECT c.id, c.title, c.content, c.creation_date, c.theme, c.original, ".
