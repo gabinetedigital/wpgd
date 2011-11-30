@@ -88,33 +88,7 @@ function wpgd_db_get_contribs($sortby, $page, $perpage, $theme, $status, $s) {
     $count = $wpdb->get_var($wpdb->prepare($sql_count));
     mysql_set_charset("utf8", $wpdb->dbh);
 
-    $roots = array();
-    $children = array();
-    foreach ($results as $r) {
-        $r['has_parts'] = 0;
-        if (($r['parent'] == 0) && ($r['part'] == 0)) {
-            $roots[] = $r;
-        } else {
-            $children[] = $r;
-        }
-    }
-
-    foreach($children as $c) {
-        $idx = index_of($roots, $c['parent']);
-        if ($idx == -1) {
-            $idx = index_of($roots, $c['part']);
-            if (isset($roots[$idx]) ) {
-                    $roots[$idx]['has_parts'] = 1;
-            }
-        }
-        array_splice($roots, $idx+1, 0, 'An uninteresting value as markplace');
-        $roots[$idx+1] = $c;
-    }
-
-    return array(
-        'count' => $count,
-        'listing' => array_map(function($x) { return (object)$x; },$roots)
-    );
+    return array($results, $count);
 }
 
 

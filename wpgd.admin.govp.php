@@ -19,6 +19,8 @@ include_once('wpgd.templating.php');
 include_once('wpgd.db.govp.php');
 include_once('wpgd.pairwise.php');
 
+define('WPGD_CONTRIBS_PER_PAGE', 50);
+
 $themes = array(
     'cuidado', 'familia', 'emergencia',
     'medicamentos', 'regional'
@@ -74,7 +76,7 @@ add_action('admin_menu', function () {
 });
 
 
-function _gen_qstring($defaults) {
+function wpgd__gen_qstring($defaults) {
     $data = array();
     foreach (array('paged', 'theme', 'status', 'sort') as $v) {
         if (!empty($_GET[$v])) {
@@ -89,32 +91,57 @@ function _gen_qstring($defaults) {
     return join("&", $data);
 }
 
-
-function wpgd_govp_main() {
-    global $renderer;
-    global $themes;
-    $perpage = 50;
-    $page = (int) (isset($_GET["paged"]) ? $_GET["paged"] : '0');
-
-    $base_listing = wpgd_db_get_contribs(
-        $_GET["sort"], $_GET['paged'], $perpage,
+function wpgd__get_contribs($page) {
+    list($contribs, $count) = wpgd_db_get_contribs(
+        $_GET["sort"], $page, WPGD_CONTRIBS_PER_PAGE,
         $_GET['theme'], $_GET['status'], $_GET['s']
     );
 
+    $roots = array();
+    $children = array();
+    foreach ($contribs as $r) {
+        $r['has_parts'] = 0;
+        if (($r['parent'] == 0) && ($r['part'] == 0)) {
+            $roots[] = $r;
+        } else {
+            $children[] = $r;
+        }
+    }
+
+    foreach($children as $c) {
+        $idx = index_of($roots, $c['parent']);
+        if ($idx == -1) {
+            $idx = index_of($roots, $c['part']);
+            if (isset($roots[$idx]) ) {
+                $roots[$idx]['has_parts'] = 1;
+            }
+        }
+        array_splice($roots, $idx+1, 0, 'An uninteresting value as markplace');
+        $roots[$idx+1] = $c;
+    }
+
+    return array($roots, $count);
+}
+function wpgd_govp_main() {
+    global $renderer;
+    global $themes;
+    $page = (int) (isset($_GET["paged"]) ? $_GET["paged"] : '0');
+
     $ctx = array();
+
+    list($ctx['listing'], $ctx['count']) =  wpgd__get_contribs($page);
+
     $ctx['themes'] = $themes;
     $ctx['s'] = $_GET['s'];
     $ctx['theme'] = $_GET['theme'];
     $ctx['status'] = $_GET['status'];
     $ctx['themecounts'] = wpgd_db_get_theme_counts();
-    $ctx['count'] = $base_listing['count'];
     $ctx['total_count'] = wpgd_db_get_contrib_count();
-    $ctx['listing'] = $base_listing['listing'];
     $ctx['siteurl'] = get_bloginfo('siteurl');
     $ctx['sortby'] = get_query_var("sort");
     $ctx['paged'] =  $page;
-    $ctx['numpages'] = ceil($ctx['count'] / $perpage);
-    $ctx['perpage'] = $perpage;
+    $ctx['numpages'] = ceil($ctx['count'] / WPGD_CONTRIBS_PER_PAGE);
+    $ctx['perpage'] = WPGD_CONTRIBS_PER_PAGE;
     $ctx['pageurl'] = remove_query_arg("sort");
     $ctx['pageurl'] = remove_query_arg("paged");
     echo $renderer->render('admin/govp/listing.html', $ctx);
