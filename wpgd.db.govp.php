@@ -15,7 +15,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-function wpgd_govp_get_contribs($sortby, $page, $perpage, $theme, $status, $s) {
+function wpgd_db_get_contribs($sortby, $page, $perpage, $theme, $status, $s) {
     $page = (strlen($page) == 0) ?  '0' : $page;
     $offset = $page * $perpage;
     $sortfields = array(
@@ -136,14 +136,14 @@ function wpgd_db_get_contrib($id) {
 }
 
 
-function wpgd_govp_get_contrib_count() {
+function wpgd_db_get_contrib_count() {
     global $wpdb;
     $sql = "SELECT count(id) FROM contrib WHERE enabled=1 ";
     return $wpdb->get_var($wpdb->prepare($sql));
 }
 
 
-function wpgd_govp_get_contrib_count_grouped_by_date() {
+function wpgd_db_get_contrib_count_grouped_by_date() {
     global $wpdb;
     $sql = "SELECT
       year(c.creation_date) AS year,
@@ -156,7 +156,7 @@ function wpgd_govp_get_contrib_count_grouped_by_date() {
 }
 
 
-function wpgd_govp_get_contrib_count_grouped_by_theme() {
+function wpgd_db_get_contrib_count_grouped_by_theme() {
     global $wpdb;
     $sql = "SELECT
       c.theme, count(c.id) AS count FROM contrib AS c
@@ -165,7 +165,7 @@ function wpgd_govp_get_contrib_count_grouped_by_theme() {
 }
 
 
-function wpgd_govp_get_contrib_count_grouped_by_themedate() {
+function wpgd_db_get_contrib_count_grouped_by_themedate() {
     global $wpdb;
     $sql = "SELECT
       c.theme,
@@ -180,7 +180,7 @@ function wpgd_govp_get_contrib_count_grouped_by_themedate() {
 }
 
 
-function wpgd_govp_get_theme_counts() {
+function wpgd_db_get_theme_counts() {
     global $wpdb;
     $ret = array();
     $sql = "SELECT COUNT(c.id) count, theme FROM contrib c GROUP BY c.theme";

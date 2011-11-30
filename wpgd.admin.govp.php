@@ -96,7 +96,7 @@ function wpgd_govp_main() {
     $perpage = 50;
     $page = (int) (isset($_GET["paged"]) ? $_GET["paged"] : '0');
 
-    $base_listing = wpgd_govp_get_contribs(
+    $base_listing = wpgd_db_get_contribs(
         $_GET["sort"], $_GET['paged'], $perpage,
         $_GET['theme'], $_GET['status'], $_GET['s']
     );
@@ -106,9 +106,9 @@ function wpgd_govp_main() {
     $ctx['s'] = $_GET['s'];
     $ctx['theme'] = $_GET['theme'];
     $ctx['status'] = $_GET['status'];
-    $ctx['themecounts'] = wpgd_govp_get_theme_counts();
+    $ctx['themecounts'] = wpgd_db_get_theme_counts();
     $ctx['count'] = $base_listing['count'];
-    $ctx['total_count'] = wpgd_govp_get_contrib_count();
+    $ctx['total_count'] = wpgd_db_get_contrib_count();
     $ctx['listing'] = $base_listing['listing'];
     $ctx['siteurl'] = get_bloginfo('siteurl');
     $ctx['sortby'] = get_query_var("sort");
@@ -125,11 +125,11 @@ function wpgd_govp_stats() {
     global $renderer;
     $ctx = array();
     $ctx['chart_byday'] =
-        json_encode(wpgd_govp_get_contrib_count_grouped_by_date());
+        json_encode(wpgd_db_get_contrib_count_grouped_by_date());
     $ctx['chart_bytheme'] =
-        json_encode(wpgd_govp_get_contrib_count_grouped_by_theme());
+        json_encode(wpgd_db_get_contrib_count_grouped_by_theme());
     $ctx['chart_bythemedate'] =
-        json_encode(wpgd_govp_get_contrib_count_grouped_by_themedate());
+        json_encode(wpgd_db_get_contrib_count_grouped_by_themedate());
     echo $renderer->render('admin/govp/stats.html', $ctx);
 }
 
@@ -138,7 +138,7 @@ function wpgd_update_contrib() {
     //backup the original author's contribution before updating it
 
     global $wpdb;
-    $org = wpgd_govp_get_contrib($_POST['data']['id']);
+    $org = wpgd_db_get_contrib($_POST['data']['id']);
 
     mysql_set_charset("latin1", $wpdb->dbh);
     switch ($_POST['data']['field']) {
@@ -228,7 +228,7 @@ function wpgd_insert_contrib() {
 function wpgd_delete_contrib() {
     global $wpdb;
     $id = $_POST['data']['id'];
-    $org = wpgd_govp_get_contrib($id);
+    $org = wpgd_db_get_contrib($id);
     if ($org->moderation) {
         $wpdb->query("DELETE FROM contrib WHERE id = '$id'");
     } else {
