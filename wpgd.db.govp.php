@@ -186,4 +186,90 @@ function wpgd_db_get_theme_counts() {
     }
     return $ret;
 }
+
+//contrib functions
+
+function wpgd_contrib_has_duplicates($contrib) {
+    global $wpdb;
+
+    if ($contrib['parent'] > 0) return true;
+
+    $sql = "SELECT COUNT(*)
+            FROM contrib
+            WHERE parent=${contrib[id]} AND enabled=1";
+
+    return $wpdb->get_var($wpdb->prepare($sql)) > 0;
+}
+
+function wpgd_contrib_get_duplicates($contrib) {
+    global $wpdb;
+
+    /*
+       the $parent contrib
+       + contribs with same parent <> 0 (ie. siblings)
+       + every other contrib with parent = $parent <> 0
+       + every child contrib (everyone whose parent=$id)
+       - self
+   */
+
+    $sql = "SELECT *
+            FROM contrib
+            WHERE (
+                 id=${contrib[parent]}
+               OR
+                 ( parent=${contrib[parent]}
+                   AND parent <> 0)
+               OR
+                 parent=${contrib[id]})
+             AND id<>${contrib[id]}
+             AND enabled=1";
+    return $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+}
+
+function wpgd_contrib_get_parent($contrib) {
+    global $wpdb;
+
+    if ($contrib['parent'] == 0) return null;
+
+    $sql = "SELECT *
+            FROM contrib
+            WHERE parent=${contrib[parent]} AND enabled=1";
+
+    $res = $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+    return count($res) > 0 ? $res[0] : null;
+}
+
+function wpgd_contrib_get_children($contrib) {
+    global $wpdb;
+
+    $sql = "SELECT *
+            FROM contrib
+            WHERE parent=${contrib[id]}
+              AND enabled=1";
+
+    return $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+}
+
+function wpgd_contrib_get_owner($contrib) {
+    return get_userdata($contrib['user_id']);
+}
+
+function wpgd_contrib_get_authors($contrib) {
+
+    function push_unique($users, $user) {
+        foreach($users as $u) {
+            if ($u->ID == $user->ID) return;
+        }
+        array_push($users, $user);
+    }
+
+    $dups = wpgd_contrib_get_duplicates($contrib);
+    $ret = array(get_userdata($contrib['user_id']));
+
+    foreach($dups as $c) {
+        push_unique($ret, get_userdata($c['user_id']));
+    }
+    return $ret;
+}
+
 ?>
