@@ -20,6 +20,35 @@ include 'Twig/Autoloader.php';
 Twig_Autoloader::register();
 
 /**
+ * Call a PHP function from a twig template
+ */
+class Twig_Extension_exec extends Twig_Extension
+{
+     public function __construct() {
+     }
+
+     public function getFunctions() {
+         return array(
+             'exec' => new Twig_Function_Method($this, 'exec')
+         );
+     }
+
+     public function exec () {
+         $args = func_get_args();
+         $name = array_shift($args);
+         if (function_exists($name)) {
+             return call_user_func_array($name, $args);
+         }
+     }
+
+     public function getName() {
+         return 'exec';
+     }
+
+}
+
+
+/**
  * A template renderer engine based on the `twig' library.
  */
 class WpGdTemplatingRenderer {
@@ -30,6 +59,7 @@ class WpGdTemplatingRenderer {
         $loader = new Twig_Loader_Filesystem($path);
         $this->twig =
             new Twig_Environment($loader, array('charset' => 'iso-8859-1'));
+        $this->twig->addExtension(new Twig_Extension_exec);
     }
 
     public function render($templateName, $context=array()) {
