@@ -1,4 +1,19 @@
+{% import "admin/govp/part.row.html" as rows %}
 <div class="wrap">
+
+  <style type="text/css">
+    td.contribution div { font-size:x-small; color:#666; }
+    td.contribution:hover ul.smenu { visibility:visible; }
+
+    ul.smenu { float:right; font-size:x-small !important; visibility:hidden; }
+    ul.smenu li { float:left; margin-left:10px; }
+
+    div.duplications strong { float:left; margin-right:10px; }
+    div.duplications ul { font-size:x-small; }
+    div.duplications ul li { display:block; float:left; margin-right:10px; }
+    div.aggregated { clear:both; }
+  </style>
+
   <h2>
     Contributions
     <a href="javascript:add_new_contrib()" class="add-new-h2">Add New</a>
@@ -89,8 +104,8 @@
         <label for="part">Part of</label>
         <input type="text" name="part" style="width:518px">
       </div>
-    <input type="button" name="OK" class="button" value="OK">
-    <input type="button" name="Cancel" class=" button" value="Cancel">
+      <input type="button" name="OK" class="button" value="OK">
+      <input type="button" name="Cancel" class=" button" value="Cancel">
     </form>
   </div>
 
@@ -100,145 +115,42 @@
          cellspacing="0">
     <thead>
       <tr>
-        <th style="width:5%"><a href="{{pageurl}}&sort=id">ID</a></th>
-        <th style="width:7%"><a href="{{pageurl}}&sort=status">Approved?</a></th>
+        <th style="width:3%"><a href="{{pageurl}}&sort=id">ID</a></th>
+        <th style="width:4%"><a href="{{pageurl}}&sort=status">Status</a></th>
         <th style="width:8%">Duplicate</th>
-        <th style="width:8%">Part of</th>
+        <!-- <th style="width:8%">Part of</th> -->
         <th style="width:10%"><a href="{{pageurl}}&sort=theme">Theme</a></th>
-        <th class="column-date" style="width:8%">
-          <a href="{{pageurl}}&sort=date">Creation date</a></th>
-        <th style="width:10%"><a href="{{pageurl}}&sort=author">Author</a></th>
         <th style="width:15%"><a href="{{pageurl}}&sort=title">Title</a></th>
         <th>Content</th>
+        <th style="width:10%"><a href="{{pageurl}}&sort=author">Author</a></th>
+        <th class="column-date" style="width:8%">
+          <a href="{{pageurl}}&sort=date">Creation date</a></th>
       </tr>
     </thead>
     <tbody id="contrib-rows">
       {% for contrib in listing %}
+        {{ rows.row(contrib) }}
 
-      {% set apr = "" %}
-      {% set bg = "" %}
-      {% if contrib.parent == 0 %}
-        {% if contrib.status == 1 %}
-         {% set apr = "wpgd-approved" %}
-         {% set bg = "wpgd-approved-bg" %}
-        {% else %}
-         {% set apr = "wpgd-disapproved" %}
-         {% set bg = "wpgd-disapproved-bg" %}
+        {% if exec("wpgd_contrib_has_duplicates", contrib)  %}
+          {% for dup in exec("wpgd_contrib_get_duplicates", contrib) %}
+            {{ rows.row(dup, "is-duplicate duplicate-of-" ~ contrib.id) }}
+          {% endfor %}
         {% endif %}
-      {% endif %}
 
-      {% if contrib.part != 0 %}
-        {% set apr = apr ~ " wpgd-part wpgd-part-bg" %}
-      {% else %}
-        {% set apr = apr ~ " " ~ bg %}
-      {% endif %}
-
-        {% if (contrib.parent == 0) and (contrib.part == 0) %}
-         {% set prt = "" %}
-        {% else %}
-          {% if (contrib.parent == 0) %}
-            {% set prt = "is-duplicate duplicate-of-" ~ contrib.parent %}
-          {% else %}
-            {% set prt = "is-part part-of-" ~ contrib.part %}
-          {% endif %}
-        {% endif %}
-      <tr class="{{apr}} {{prt}}" id="row-{{ contrib.id }}">
-
-        <td class="contrib-id">
-          <a class="delete-contrib" href="{{contrib.id}}">X</a>
-          {{ contrib.id }}
-        </td>
-
-        <td class="contrib-status"
-            id="contrib-status[{{contrib.id}}]">
-          <input type="checkbox"
-                 {% if contrib.parent != 0 %}
-                 style="display:none"
-                 {% endif %}
-                 {{contrib.status|replace({1:'checked',0:''})}}>
-          <span
-                 {% if contrib.parent == 0 %}
-                 style="display:none"
-                 {% endif %}>
-            ^</span>
-          </td>
-
-        <td>
-          {% if contrib.moderation == 0 %}
-          <input
-             type="text" id="contrib-duplicate[{{contrib.id}}]"
-             class="contrib-duplicates contrib-duplicate[{{contrib.parent}}]"
-             value="{{ contrib.parent }}" style="width:95%">
-          {% endif %}
-        </td>
-
-        <td>
-          <input
-             type="text" id="contrib-part[{{contrib.id}}]"
-             class="contrib-parts contrib-part[{{contrib.part}}]"
-             value="{{ contrib.part }}" style="width:95%">
-        </td>
-
-        <td id="contrib-theme[{{contrib.id}}]"
-            class="contrib-theme">
-          <select
-             class="wpgd-theme wpgd-the-theme[{{contrib.theme}}]"
-             id="wpgd-theme-id[{{contrib.id}}]" name="theme">
-            <option
-               name="cuidado"
-               {% if contrib.theme == 'cuidado' %} selected {% endif %}>
-              cuidado
-            </option>
-            <option
-               name="familia"
-               {% if contrib.theme == 'familia' %} selected {% endif %}>
-              familia
-            </option>
-            <option
-               name="emergencia"
-               {% if contrib.theme == 'emergencia' %} selected {% endif %}>
-              emergencia
-            </option>
-            <option
-               name="medicamentos"
-               {% if contrib.theme == 'medicamentos' %} selected {% endif %}>
-              medicamentos
-            </option>
-            <option
-               name="regional"
-               {% if contrib.theme == 'regional' %} selected {% endif %}>
-              regional
-            </option>
-          </select>
-        </td>
-
-        <td>{{ contrib.creation_date|date("d/m/Y") }}</td>
-
-        <td>
-          <a href="{{siteurl}}/wp-admin/user-edit.php?user_id={{ contrib.user_id }}">
-            {{ contrib.display_name }}
-          </a>
-        </td>
-
-        <td id="contrib-title[{{contrib.id}}]"
-            class="contribution-title">{{ contrib.title }}</td>
-        <td id="contrib[{{contrib.id}}]"
-            class="contribution">{{ contrib.content }}</td>
-      </tr>
       {% endfor %}
     </tbody>
 
     <tfoot>
       <tr>
         <th classs="manage-column sortable desc" scope="col">ID</th>
-        <th classs="manage-column sortable desc" scope="col">Approved?</th>
+        <th classs="manage-column sortable desc" scope="col">Status</th>
         <th classs="manage-column sortable desc" scope="col">Duplicate of</th>
-        <th classs="manage-column sortable desc" scope="col">Part of</th>
+        <!-- <th classs="manage-column sortable desc" scope="col">Part of</th> -->
         <th classs="manage-column sortable asc" scope="col">Theme</th>
-        <th classs="manage-column sortable desc" scope="col">Creation Date</th>
-        <th classs="manage-column sortable desc" scope="col">Author</th>
         <th classs="manage-column sortable desc" scope="col">Title</th>
         <th classs="manage-column sortable asc" scope="col">Content</th>
+        <th classs="manage-column sortable desc" scope="col">Author</th>
+        <th classs="manage-column sortable desc" scope="col">Creation Date</th>
       </tr>
     </tfoot>
   </table>

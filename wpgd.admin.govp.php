@@ -91,38 +91,19 @@ function wpgd__gen_qstring($defaults) {
     return join("&", $data);
 }
 
-//returns sorted contributions to render on the html table
+
+/**
+ * Returns sorted contributions to render on the html table
+ */
 function wpgd__sorted_contribs($page) {
-    list($contribs, $count) = wpgd_db_get_contribs(
+    list($contribs, $count) = wpgd_db_get_unique_contribs(
         $_GET["sort"], $page, WPGD_CONTRIBS_PER_PAGE,
         $_GET['theme'], $_GET['status'], $_GET['s']
     );
-
-    $roots = array();
-    $children = array();
-    foreach ($contribs as $r) {
-        $r['has_parts'] = 0;
-        if (($r['parent'] == 0) && ($r['part'] == 0)) {
-            $roots[] = $r;
-        } else {
-            $children[] = $r;
-        }
-    }
-
-    foreach($children as $c) {
-        $idx = index_of($roots, $c['parent']);
-        if ($idx == -1) {
-            $idx = index_of($roots, $c['part']);
-            if (isset($roots[$idx]) ) {
-                $roots[$idx]['has_parts'] = 1;
-            }
-        }
-        array_splice($roots, $idx+1, 0, 'An uninteresting value as markplace');
-        $roots[$idx+1] = $c;
-    }
-
-    return array($roots, $count);
+    return array($contribs, $count);
 }
+
+
 function wpgd_govp_main() {
     global $renderer;
     global $themes;
@@ -168,7 +149,7 @@ function wpgd_update_contrib() {
     global $wpdb;
     $org = wpgd_db_get_contrib($_POST['data']['id']);
 
-    mysql_set_charset("latin1", $wpdb->dbh);
+    _wpgd_enter_encoding();
     switch ($_POST['data']['field']) {
     case 'content':
         if (strlen($org->original) == 0) {
@@ -198,7 +179,7 @@ function wpgd_update_contrib() {
         break;
     case 'parent':
         if ($_POST['data']['parent'] != "0") {
-            $parent = wpgd_govp_get_contrib($_POST['data']['parent']);
+            $parent = wpgd_db_get_contrib($_POST['data']['parent']);
 
             if ($parent == null) {
                 die("not-found");
@@ -226,15 +207,13 @@ function wpgd_update_contrib() {
                           array('id' => $_POST['data']['id'])));
         break;
     }
-    mysql_set_charset("utf8", $wpdb->dbh);
+    _wpgd_leave_encoding();
 }
 
 
 function wpgd_insert_contrib() {
     global $wpdb;
-    if (mysql_client_encoding($wpdb->dbh) == 'utf8') {
-        mysql_set_charset("latin1", $wpdb->dbh);
-    }
+    _wpgd_enter_encoding();
     $current_user = wp_get_current_user();
 
     $ret = $wpdb->insert("contrib",
@@ -247,7 +226,7 @@ function wpgd_insert_contrib() {
                                'enabled' => 1,
                                'status' => 0,
                                'moderation' => true));
-    mysql_set_charset("utf8", $wpdb->dbh);
+    _wpgd_leave_encoding();
     die($ret);
 }
 

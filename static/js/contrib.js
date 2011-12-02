@@ -151,11 +151,13 @@ jQuery(function() {
   function inliner(dbfield, accessor, editable) {
     var original_text;
     var td;
+    var p;
     function show_field() {
-      td = $(this);
-      td.unbind("dblclick", arguments.callee);
+      p = $(this).find('p');
+      td = p.parent();
+      p.unbind("dblclick", arguments.callee);
       var id = /\[([0-9]+)\]/.exec(td.attr("id"))[1];
-      original_text = td.html();
+      original_text = p.html();
 
       var ok = $("<input type='submit' value='OK'>").click(function() {
         var data = {id:id,field:dbfield};
@@ -178,13 +180,13 @@ jQuery(function() {
       var cancel = $("<input type='submit' value='Cancel'>")
         .click(revert_editable);
 
-      accessor.call(editable, td.html());
-      td.html('');
-      td.append(editable).append(ok).append(cancel);
+      accessor.call(editable, p.html());
+      p.html('');
+      p.append(editable).append(ok).append(cancel);
     }
     function revert_editable() {
-      td.bind('dblclick',show_field);
-      td.html(original_text);
+      p.bind('dblclick',show_field);
+      p.html(original_text);
     }
     return show_field;
   }

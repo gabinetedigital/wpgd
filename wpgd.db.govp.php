@@ -15,6 +15,18 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
+function _wpgd_enter_encoding() {
+    global $wpdb;
+    if (mysql_client_encoding($wpdb->dbh) == 'utf8') {
+        mysql_set_charset("latin1", $wpdb->dbh);
+    }
+}
+
+function _wpgd_leave_encoding() {
+    global $wpdb;
+    mysql_set_charset("utf8", $wpdb->dbh);
+}
+
 function wpgd_db_get_contribs($sortby,
                               $page,
                               $perpage,
@@ -74,7 +86,7 @@ function wpgd_db_get_contribs($sortby,
       SELECT
           contrib.id, contrib.title, contrib.content, contrib.creation_date,
           contrib.theme, contrib.original, contrib.status, user.display_name,
-          contrib.parent, contrib.part, contrib.moderation, user.ID as user_id
+          contrib.parent, contrib.moderation, user.ID as user_id
     ";
 
     $sql_base ="
@@ -88,12 +100,10 @@ function wpgd_db_get_contribs($sortby,
     $sql_main = $sql_head . $sql_base . "LIMIT $offset, $perpage";
     $sql_count = "SELECT COUNT(contrib.id) AS total " . $sql_base;
 
-    if (mysql_client_encoding($wpdb->dbh) == 'utf8') {
-        mysql_set_charset("latin1", $wpdb->dbh);
-    }
+    _wpgd_enter_encoding();
     $results = $wpdb->get_results($wpdb->prepare($sql_main), ARRAY_A);
     $count = $wpdb->get_var($wpdb->prepare($sql_count));
-    mysql_set_charset("utf8", $wpdb->dbh);
+    _wpgd_leave_encoding();
 
     return array($results, $count);
 }
@@ -119,17 +129,15 @@ function wpgd_db_get_contrib($id) {
     global $wpdb;
     $sql = "
       SELECT c.id, c.title, c.content, c.creation_date, c.theme, c.original, ".
-      " c.status, u.display_name, c.parent, c.part, c.moderation ".
+      " c.status, u.display_name, c.parent, c.moderation ".
       " FROM contrib c, wp_users u ".
       " WHERE c.user_id=u.ID AND c.enabled=true AND c.id=%d";
 
-    if(mysql_client_encoding($wpdb->dbh) == 'utf8') {
-        mysql_set_charset( "latin1", $wpdb->dbh );
-    }
-    $res = $wpdb->get_results($wpdb->prepare($sql,array($id)));
-    mysql_set_charset( "utf8", $wpdb->dbh );
+    _wpgd_enter_encoding();
+    $res = $wpdb->get_var($wpdb->prepare($sql,array($id)));
+    _wpgd_leave_encoding();
 
-    return count($res) == 1 ? $res[0] : null;
+    return $res;
 }
 
 
@@ -201,7 +209,23 @@ function wpgd_contrib_has_duplicates($contrib) {
     return $wpdb->get_var($wpdb->prepare($sql)) > 0;
 }
 
+
 function wpgd_contrib_get_duplicates($contrib) {
+    global $wpdb;
+
+    $sql = "SELECT *
+            FROM contrib
+            WHERE parent=${contrib[id]}
+              AND enabled=1";
+
+    _wpgd_enter_encoding();
+    $res = $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+    _wpgd_leave_encoding();
+    return $res;
+}
+
+
+function wpgd_contrib_get_all_duplicates($contrib) {
     global $wpdb;
 
     /*
@@ -210,7 +234,7 @@ function wpgd_contrib_get_duplicates($contrib) {
        + every other contrib with parent = $parent <> 0
        + every child contrib (everyone whose parent=$id)
        - self
-   */
+    */
 
     $sql = "SELECT *
             FROM contrib
@@ -226,33 +250,22 @@ function wpgd_contrib_get_duplicates($contrib) {
     return $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
 }
 
+
 function wpgd_contrib_get_parent($contrib) {
     global $wpdb;
 
-    if ($contrib['parent'] == 0) return null;
-
-    $sql = "SELECT *
-            FROM contrib
-            WHERE parent=${contrib[parent]} AND enabled=1";
-
-    $res = $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
-    return count($res) > 0 ? $res[0] : null;
+    if ($contrib['parent'] == 0)
+        return null;
+    $sql = "SELECT * FROM contrib
+            WHERE id=${contrib[parent]} AND enabled=1";
+    return $wpdb->get_var($wpdb->prepare($sql), ARRAY_A);
 }
 
-function wpgd_contrib_get_children($contrib) {
-    global $wpdb;
-
-    $sql = "SELECT *
-            FROM contrib
-            WHERE parent=${contrib[id]}
-              AND enabled=1";
-
-    return $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
-}
 
 function wpgd_contrib_get_owner($contrib) {
     return get_userdata($contrib['user_id']);
 }
+
 
 function wpgd_contrib_get_authors($contrib) {
 

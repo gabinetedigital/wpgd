@@ -1,0 +1,140 @@
+{% macro row(contrib, klass) %}
+
+{% set apr = "" %}
+{% set bg = "" %}
+{% if contrib.parent == 0 %}
+{% if contrib.status == 1 %}
+{% set apr = "wpgd-approved" %}
+{% set bg = "wpgd-approved-bg" %}
+{% else %}
+{% set apr = "wpgd-disapproved" %}
+{% set bg = "wpgd-disapproved-bg" %}
+{% endif %}
+{% endif %}
+
+{% if contrib.part != 0 %}
+{% set apr = apr ~ " wpgd-part wpgd-part-bg" %}
+{% else %}
+{% set apr = apr ~ " " ~ bg %}
+{% endif %}
+
+<tr class="{{ apr }} {{ klass }}" id="row-{{ contrib.id }}">
+
+  <td class="contrib-id">
+    <a class="delete-contrib" href="{{contrib.id}}">X</a>
+    {{ contrib.id }}
+  </td>
+
+  <td class="contrib-status"
+      id="contrib-status[{{contrib.id}}]">
+    <input type="checkbox"
+           {% if contrib.parent != 0 %}
+           style="display:none"
+           {% endif %}
+           {{contrib.status|replace({1:'checked',0:''})}}>
+    <span
+       {% if contrib.parent == 0 %}
+       style="display:none"
+       {% endif %}>
+      ^</span>
+  </td>
+
+  <td>
+    {% if contrib.moderation == 0 %}
+    <input
+       type="text" id="contrib-duplicate[{{contrib.id}}]"
+       class="contrib-duplicates contrib-duplicate[{{contrib.parent}}]"
+       value="{{ contrib.parent }}" style="width:95%">
+    {% endif %}
+  </td>
+
+  <!-- <td> -->
+  <!--   <input -->
+  <!--      type="text" id="contrib-part[{{contrib.id}}]" -->
+  <!--      class="contrib-parts contrib-part[{{contrib.part}}]" -->
+  <!--      value="{{ contrib.part }}" style="width:95%"> -->
+  <!-- </td> -->
+
+  <td id="contrib-theme[{{contrib.id}}]"
+      class="contrib-theme">
+    <select
+       class="wpgd-theme wpgd-the-theme[{{contrib.theme}}]"
+       id="wpgd-theme-id[{{contrib.id}}]" name="theme">
+      <option
+         name="cuidado"
+         {% if contrib.theme == 'cuidado' %} selected {% endif %}>
+        cuidado
+      </option>
+      <option
+         name="familia"
+         {% if contrib.theme == 'familia' %} selected {% endif %}>
+        familia
+      </option>
+      <option
+         name="emergencia"
+         {% if contrib.theme == 'emergencia' %} selected {% endif %}>
+        emergencia
+      </option>
+      <option
+         name="medicamentos"
+         {% if contrib.theme == 'medicamentos' %} selected {% endif %}>
+        medicamentos
+      </option>
+      <option
+         name="regional"
+         {% if contrib.theme == 'regional' %} selected {% endif %}>
+        regional
+      </option>
+    </select>
+  </td>
+
+  <td id="contrib-title[{{contrib.id}}]"
+      class="contribution-title"><p>{{ contrib.title }}</p></td>
+  <td id="contrib[{{contrib.id}}]"
+      class="contribution">
+    <p>{{ contrib.content }}</p>
+
+    {% if contrib.parent > 0 %}
+    <div class="parent">
+      <strong>Parent:</strong> #{{ contrib.parent }}
+    </div>
+    {% else %}
+    <ul class="smenu">
+      <li><a href="#">Mark as duplicated</a></li>
+      <li>|</li>
+      <li><a href="#">Add child</a></li>
+    </ul>
+    {% endif %}
+
+    {% if exec("wpgd_contrib_has_duplicates", contrib) %}
+    <div class="duplications">
+      <strong>Duplications:</strong>
+      <ul>
+        {% for i in exec("wpgd_contrib_get_duplicates", contrib) %}
+        <li><a href="#">#{{ i.id }}</a></li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+
+    {% if exec("wpgd_contrib_has_children", contrib) %}
+    <div class="children">
+      <strong>Children:</strong>
+      <ul>
+        {% for i in exec("wpgd_contrib_get_children", contrib) %}
+        <li>{{ i.id }}</li>
+        {% endfor %}
+      </ul>
+    </div>
+    {% endif %}
+  </td>
+  <td>
+    <a href="{{siteurl}}/wp-admin/user-edit.php?user_id={{ contrib.user_id }}">
+      {{ contrib.display_name }}
+    </a>
+  </td>
+  <td>{{ contrib.creation_date|date("d/m/Y") }}</td>
+
+</tr>
+
+{% endmacro %}
