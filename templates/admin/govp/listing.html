@@ -1,19 +1,6 @@
 {% import "admin/govp/part.row.html" as rows %}
 <div class="wrap">
 
-  <style type="text/css">
-    td.contribution div { font-size:x-small; color:#666; }
-    td.contribution:hover ul.smenu { visibility:visible; }
-
-    ul.smenu { float:right; font-size:x-small !important; visibility:hidden; }
-    ul.smenu li { float:left; margin-left:10px; }
-
-    div.duplications strong { float:left; margin-right:10px; }
-    div.duplications ul { font-size:x-small; }
-    div.duplications ul li { display:block; float:left; margin-right:10px; }
-    div.aggregated { clear:both; }
-  </style>
-
   <h2>
     Contributions
     <a href="javascript:add_new_contrib()" class="add-new-h2">Add New</a>
@@ -130,13 +117,6 @@
     <tbody id="contrib-rows">
       {% for contrib in listing %}
         {{ rows.row(contrib) }}
-
-        {% if exec("wpgd_contrib_has_duplicates", contrib)  %}
-          {% for dup in exec("wpgd_contrib_get_duplicates", contrib) %}
-            {{ rows.row(dup, "is-duplicate duplicate-of-" ~ contrib.id) }}
-          {% endfor %}
-        {% endif %}
-
       {% endfor %}
     </tbody>
 

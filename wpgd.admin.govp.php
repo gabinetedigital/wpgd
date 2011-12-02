@@ -96,11 +96,30 @@ function wpgd__gen_qstring($defaults) {
  * Returns sorted contributions to render on the html table
  */
 function wpgd__sorted_contribs($page) {
-    list($contribs, $count) = wpgd_db_get_unique_contribs(
+    list($contribs, $count) = wpgd_db_get_contribs(
         $_GET["sort"], $page, WPGD_CONTRIBS_PER_PAGE,
         $_GET['theme'], $_GET['status'], $_GET['s']
     );
     return array($contribs, $count);
+}
+
+
+/**
+ * Helper function to get the proper css class of a contribution row
+ */
+function wpgd__get_class($contrib) {
+    $klass = array();
+    if ($contrib['parent'] > 0) {
+        array_push($klass, "is-duplicated");
+        array_push($klass, "duplication-of-${contrib[parent]}");
+    } else {
+        if ($contrib['status'] == 1) {
+            array_push($klass, "wpgd-approved");
+        } else {
+            array_push($klass, "wpgd-disapproved");
+        }
+    }
+    return join(" ", $klass);
 }
 
 

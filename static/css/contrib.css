@@ -1,18 +1,30 @@
+td.contribution div { font-size:x-small; color:#666; }
+td.contribution:hover ul.smenu { visibility:visible; }
+
+ul.smenu { float:right; font-size:x-small !important; visibility:hidden; }
+ul.smenu li { float:left; margin-left:10px; }
+
+div.duplications strong { float:left; margin-right:10px; }
+div.duplications ul { font-size:x-small; }
+div.duplications ul li { display:block; float:left; margin-right:10px; }
+div.aggregated { clear:both; }
+
+
 .contribution textarea {
     width: 100%;
     height: 200px;
 }
 
-.wpgd-approved-bg {
-    background-color:#E0FFD1;
+.wpgd-approved {
+    background-color:#e0ffd1;
 }
 
-.wpgd-disapproved-bg {
-    background-color:#FFE6E6;
+.wpgd-disapproved {
+    background-color:#ffe6e6;
 }
 
-.wpgd-part-bg {
-    background-color:#A9FFD1;
+.wpgd-part {
+    background-color:#a9ffd1;
 }
 
 .wpgd-status-bar {

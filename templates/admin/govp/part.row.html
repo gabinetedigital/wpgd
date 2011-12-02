@@ -1,24 +1,6 @@
 {% macro row(contrib, klass) %}
 
-{% set apr = "" %}
-{% set bg = "" %}
-{% if contrib.parent == 0 %}
-{% if contrib.status == 1 %}
-{% set apr = "wpgd-approved" %}
-{% set bg = "wpgd-approved-bg" %}
-{% else %}
-{% set apr = "wpgd-disapproved" %}
-{% set bg = "wpgd-disapproved-bg" %}
-{% endif %}
-{% endif %}
-
-{% if contrib.part != 0 %}
-{% set apr = apr ~ " wpgd-part wpgd-part-bg" %}
-{% else %}
-{% set apr = apr ~ " " ~ bg %}
-{% endif %}
-
-<tr class="{{ apr }} {{ klass }}" id="row-{{ contrib.id }}">
+<tr class="{{ exec("wpgd__get_class", contrib) }} {{ klass }}" id="row-{{ contrib.id }}">
 
   <td class="contrib-id">
     <a class="delete-contrib" href="{{contrib.id}}">X</a>
@@ -36,7 +18,7 @@
        {% if contrib.parent == 0 %}
        style="display:none"
        {% endif %}>
-      ^</span>
+      </span>
   </td>
 
   <td>
@@ -100,11 +82,8 @@
     </div>
     {% else %}
     <ul class="smenu">
-      <li><a href="#">Mark as duplicated</a></li>
-      <li>|</li>
       <li><a href="#">Add child</a></li>
     </ul>
-    {% endif %}
 
     {% if exec("wpgd_contrib_has_duplicates", contrib) %}
     <div class="duplications">
@@ -115,6 +94,8 @@
         {% endfor %}
       </ul>
     </div>
+    {% endif %}
+
     {% endif %}
 
     {% if exec("wpgd_contrib_has_children", contrib) %}
