@@ -353,7 +353,8 @@ function wpgd_db_get_contribs_sorted_by_score(
     list($scores, $count) = wpgd_pairwise_get_sorted_by_score($page, $perpage);
     $contribs = array();
     foreach($scores as $sdata) {
-        $contrib = wpgd_db_get_contrib($sdata['id']);
+        $json = json_decode($sdata['data']);
+        $contrib = wpgd_db_get_contrib($json->id);
         $contrib['score'] = $sdata['score'];
         $contribs[] = $contrib;
     }
