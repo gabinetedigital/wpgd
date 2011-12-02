@@ -28,7 +28,7 @@ function wpgd_thumbs_init_sizes() {
         // Here we set the default post thumbnail dimensions, that
         // is the size that we use in the `news' box present in the
         // index page.
-        add_image_size('newsbox', 120, 110, true);
+        add_image_size('newsbox', 220, 130, true);
 
         // This is the second type type of image size present in the
         // news box, the one that takes all the width of the box.
