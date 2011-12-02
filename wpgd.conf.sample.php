@@ -23,4 +23,11 @@ $PAIRWISE_THEMES = array(
                          'regional' => 5);
 
 $PAIRWISE_CREATE_CHOICE_URL = "http://pairuser:pairpass@localhost:4000/questions/<qid>/choices.xml?choice%5Bdata%5D=<text>";
+
+
+define('PAIRWISE_DB_HOST', 'host');
+define('PAIRWISE_DB_NAME', 'name');
+define('PAIRWISE_DB_USER', 'user');
+define('PAIRWISE_DB_PASS', 'pass');
+
 ?>

@@ -35,4 +35,80 @@ function wpgd_pairwise_send_contrib($contrib) {
   return !PEAR::isError($res);
 }
 
+$wpgd_pairwise_link = null;
+function wpgd_pairwise_db_link() {
+    global $wpgd_pairwise_link;
+    if ($wpgd_pairwise_link) return $wpgd_pairwise_link;
+
+    $wpgd_pairwise_link = mysql_connect(PAIRWISE_DB_HOST
+                                        , PAIRWISE_DB_USER
+                                        , PAIRWISE_DB_PASS, true);
+
+    if (!$wpgd_pairwise_link) {
+        throw new Exception(mysql_error($wpgd_pairwise_link));
+    }
+
+    if (!mysql_select_db(PAIRWISE_DB_NAME, $wpgd_pairwise_link)) {
+        throw new Exception(mysql_error($wpgd_pairwise_link));
+    }
+    return $wpgd_pairwise_link;
+}
+
+function wpgd_pairwise_get_var($sql, $argp = array()) {
+    global $wpdb;
+    $link = wpgd_pairwise_db_link();
+
+    $sql = $wpdb->prepare($sql, $argp);
+    $res = mysql_query($sql, $link);
+    if (!$res) {
+        throw new Exception(mysql_error($link));
+    }
+    return array_pop(mysql_fetch_array($res, MYSQL_NUM));
+}
+
+function wpgd_pairwise_get_results($sql, $argp = array()) {
+    global $wpdb;
+    $link = wpgd_pairwise_db_link();
+
+    $sql = $wpdb->prepare($sql, $argp);
+    $res = mysql_query($sql, $link);
+
+    if (!$res) {
+        throw new Exception(mysql_error($link));
+    }
+
+    $ret = array();
+    while ($row = mysql_fetch_array($res)) {
+        $ret[] = $row;
+    }
+
+    return $ret;
+}
+
+function wpgd_pairwise_get_sorted_by_score($page, $perpage) {
+    global $wpdb;
+
+    $link = wpgd_pairwise_db_link();
+
+    $sql_base = "FROM choices
+                 ORDER BY score desc";
+
+    $sql = $wpdb->prepare("SELECT id, score, data $sql_base LIMIT %d, %d",
+                          array($page, $perpage));
+
+    $res = mysql_query($sql, $link);
+
+    if (!$res) {
+        throw new Exception(mysql_error($link));
+    }
+
+    $ret = array();
+    while ($row = mysql_fetch_array($res)) {
+        $ret[] = $row;
+    }
+
+    $sql = "SELECT COUNT(id) $sql_base";
+    $count = array_pop(mysql_fetch_array(mysql_query($wpdb->prepare($sql))));
+    return array($ret, $count);
+}
 ?>

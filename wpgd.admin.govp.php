@@ -45,6 +45,10 @@ add_action('admin_menu', function () {
         $menupage, 'Stats', 'Stats',
         'moderate_contrib', 'gd-admin-stats', 'wpgd_govp_stats');
 
+    $scores = add_submenu_page(
+        $menupage, 'Scores', 'Scores',
+        'moderate_contrib', 'gd-admin-scores', 'wpgd_govp_scores');
+
     /* Loading javascript */
     add_action('admin_enqueue_scripts', function ($hooksufix) use ($contribs, $stats) {
         switch ($hooksufix) {
@@ -178,6 +182,22 @@ function wpgd_govp_stats() {
     echo $renderer->render('admin/govp/stats.html', $ctx);
 }
 
+function wpgd_govp_scores() {
+    global $renderer;
+    $page = (int) (isset($_GET["paged"]) ? $_GET["paged"] : '1');
+
+    $ctx = array();
+
+    list($ctx['listing'], $ctx['count']) =
+        wpgd_db_get_contribs_sorted_by_score($page, WPGD_CONTRIBS_PER_PAGE);
+
+    $ctx['siteurl'] = get_bloginfo('siteurl');
+    $ctx['paged'] =  $page;
+    $ctx['numpages'] = ceil($ctx['count'] / WPGD_CONTRIBS_PER_PAGE);
+    $ctx['perpage'] = WPGD_CONTRIBS_PER_PAGE;
+    $ctx['pageurl'] = remove_query_arg("paged");
+    echo $renderer->render('admin/govp/scores.html', $ctx);
+}
 
 function wpgd_update_contrib() {
     //backup the original author's contribution before updating it

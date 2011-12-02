@@ -43,14 +43,13 @@ function _wpgd_get_contrib_row($sql, $argp = array()) {
     return $ret;
 }
 
-function wpgd_db_get_contribs($sortby,
-                              $page,
-                              $perpage,
-                              $theme,
-                              $status,
-                              $s,
+function wpgd_db_get_contribs($sortby = 'contrib.id',
+                              $page = '0',
+                              $perpage = WPGD_CONTRIBS_PER_PAGE,
+                              $theme = null,
+                              $status = null,
+                              $s = null,
                               $filter = null) {
-    $page = (strlen($page) == 0) ?  '0' : $page;
     $offset = $page * $perpage;
     $sortfields = array(
         'id' => 'contrib.id' ,
@@ -80,10 +79,10 @@ function wpgd_db_get_contribs($sortby,
     /* Handling filters */
     $filter = $filter ? " AND ($filter) " : "";
     $filters = array();
-    if (!empty($theme)) {
+    if ($theme) {
         array_push($filters, "contrib.theme = '$theme'");
     }
-    if (!empty($status)) {
+    if ($status) {
         array_push($filters, "contrib.status = $status");
     }
     if (count($filters) > 0) {
@@ -92,8 +91,8 @@ function wpgd_db_get_contribs($sortby,
 
     /* Handling the text search */
     $search = "";
-    if (!empty($_GET['s'])) {
-        $s = '%%' . $_GET['s'] . '%%';
+    if ($s) {
+        $s = '%%' . $s . '%%';
         $search = "AND (title LIKE '$s' OR content LIKE '$s')";
     }
 
@@ -344,4 +343,22 @@ function wpgd_contrib_get_parents($contrib) {
         contrib_children__contrib.inverse_id = contrib.id";
     return _wpgd_get_contrib_results($sql);
 }
+
+
+function wpgd_db_get_contribs_sorted_by_score(
+                                           $page = '0'
+                                         , $perpage = WPGD_CONTRIBS_PER_PAGE) {
+
+
+    list($scores, $count) = wpgd_pairwise_get_sorted_by_score($page, $perpage);
+    $contribs = array();
+    foreach($scores as $sdata) {
+        $contrib = wpgd_db_get_contrib($sdata['id']);
+        $contrib['score'] = $sdata['score'];
+        $contribs[] = $contrib;
+    }
+
+    return array($contribs, $count);
+}
+
 ?>

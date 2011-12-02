@@ -1,0 +1,57 @@
+<div class="wrap">
+  <h2>
+    Scores
+  </h2>
+
+  <table class="wp-list-table widefat audiences fixed"
+         cellspacing="0">
+    <thead>
+      <tr>
+        <th style="width:8%">ID</th>
+        <th style="width:15%">Title</th>
+        <th style="width:10%">Theme</th>
+        <th>Content</th>
+        <th style="width:10%">Author</th>
+        <th class="column-date" style="width:8%">
+          Creation date</th>
+        <th style="width:8%">Score</th>
+      </tr>
+    </thead>
+    <tbody id="contrib-rows">
+      {% for contrib in listing %}
+      <tr>
+        <td>{{contrib.id}}</td>
+        <td>{{contrib.title}}</td>
+        <td>{{contrib.theme}}</td>
+        <td>{{contrib.content}}</td>
+        <td>{{contrib.display_name}}</td>
+        <td>{{contrib.creation_date|date("d/m/Y")}}</td>
+        <td>{{contrib.score}}</td>
+      </tr>
+      {% endfor %}
+    </tbody>
+
+    <tfoot>
+      <tr>
+        <th classs="manage-column sortable desc" scope="col">ID</th>
+        <th classs="manage-column sortable desc" scope="col">Title</th>
+        <th classs="manage-column sortable desc" scope="col">Theme<Theme/th>
+        <th classs="manage-column sortable asc" scope="col">Content</th>
+        <th classs="manage-column sortable desc" scope="col">Author</th>
+        <th classs="manage-column sortable desc" scope="col">Creation Date</th>
+        <th classs="manage-column sortable desc" scope="col">Score</th>
+      </tr>
+    </tfoot>
+  </table>
+  {% if paged > 1 %}
+  <a href="{{pageurl}}&paged={{paged-1}}">previous</a>
+  {% else %}
+  previous
+  {% endif %}
+  ({{paged}}/{{numpages}})
+  {% if numpages >  (paged) %}
+    <a href="{{pageurl}}&paged={{paged+1}}">next</a>
+  {% else %}
+    next
+  {% endif %}
+</div>
