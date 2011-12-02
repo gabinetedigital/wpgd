@@ -112,6 +112,8 @@ function wpgd__get_class($contrib) {
     if ($contrib['parent'] > 0) {
         array_push($klass, "is-duplicated");
         array_push($klass, "duplication-of-${contrib[parent]}");
+    } else if (wpgd_contrib_get_parents($contrib)){
+        array_push($klass, "wpgd-part");
     } else {
         if ($contrib['status'] == 1) {
             array_push($klass, "wpgd-approved");
@@ -120,6 +122,21 @@ function wpgd__get_class($contrib) {
         }
     }
     return join(" ", $klass);
+}
+
+
+function wpgd__get_parents_string($contrib) {
+    $parents = array();
+    foreach (wpgd_contrib_get_parents($contrib) as $c) {
+        array_push($parents, $c['id']);
+    }
+    return join(" ", $parents);
+}
+
+
+function wpgd__can_be_approved($contrib) {
+    return count(wpgd_contrib_get_parents($contrib)) == 0 &&
+        $contrib['parent'] == 0;
 }
 
 
@@ -171,9 +188,9 @@ function wpgd_update_contrib() {
     _wpgd_enter_encoding();
     switch ($_POST['data']['field']) {
     case 'content':
-        if (strlen($org->original) == 0) {
+        if (strlen($org['original']) == 0) {
             $wpdb->update("contrib",
-                          array('original' => $org->content),
+                          array('original' => $org['content']),
                           array('id' => $_POST['data']['id']));
         }
         die($wpdb->update("contrib",
@@ -187,7 +204,7 @@ function wpgd_update_contrib() {
         break;
 
     case 'status':
-        $val = !($org->status);
+        $val = !($org['status']);
         $wpdb->update("contrib",
                       array('status' => $val),
                       array('id' => $_POST['data']['id']));
@@ -210,15 +227,28 @@ function wpgd_update_contrib() {
         break;
     case 'part':
         if ($_POST['data']['part'] != "0") {
-            $part = wpgd_govp_get_contrib($_POST['data']['part']);
+            $pids = explode(" ", $_POST['data']['part']);
 
-            if ($part == null) {
-                die("not-found");
+            /* FIXME: avoid calling _get_contrib() twice for each
+             * contrib in this function */
+            foreach ($pids as $pid) {
+                $parent = wpgd_db_get_contrib($pid);
+                if ($parent == null) {
+                    die("not-found");
+                }
+            }
+
+            /* Removing all parts previously added */
+            wpgd_contrib_remove_all_parts($org);
+
+            /* Now we're sure that everything's good, so we can insert
+             * the new parts. */
+            foreach ($pids as $pid) {
+                $parent = wpgd_db_get_contrib($pid);
+                wpgd_contrib_append_part($parent, $org);
             }
         }
-        die($wpdb->update("contrib",
-                          array('part' => $_POST['data']['part']),
-                          array('id' => $_POST['data']['id'])));
+        die("ok");
         break;
     case 'theme':
         die($wpdb->update("contrib",
@@ -254,7 +284,7 @@ function wpgd_delete_contrib() {
     global $wpdb;
     $id = $_POST['data']['id'];
     $org = wpgd_db_get_contrib($id);
-    if ($org->moderation) {
+    if ($org['moderation']) {
         $wpdb->query("DELETE FROM contrib WHERE id = '$id'");
     } else {
         $wpdb->update("contrib",

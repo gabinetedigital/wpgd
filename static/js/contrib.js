@@ -252,13 +252,15 @@ jQuery(function() {
   $(".contrib-parts").change(function() {
     var self = $(this);
     var id = /\[([0-9]+)\]/.exec(self.attr("id"))[1];
-    var parent = /contrib-part\[([0-9]+)\]/.exec(self.attr("class"))[1];
+    var default_val = self.attr('default');
     var new_parent = self.val();
-    if (is_child(new_parent)) {
-      alert("Can't be a part of a part");
-      self.val(parent);
-      return;
-    }
+
+    // var parent = /contrib-part\[([0-9]+)\]/.exec(self.attr("class"))[1];
+    // if (is_child(new_parent)) {
+    //   alert("Can't be a part of a part");
+    //   self.val(parent);
+    //   return;
+    // }
 
     // if (new_parent != 0 && $("#row-"+new_parent).length == 0) {
     //   alert("Can't find contrib with ID = " + new_parent);
@@ -266,16 +268,16 @@ jQuery(function() {
     //   return;
     // }
 
-    if (id == new_parent) {
-      alert("Can't be part of itself");
-      self.val(parent);
-      return;
-    }
+    // if (id == new_parent) {
+    //   alert("Can't be part of itself");
+    //   self.val(parent);
+    //   return;
+    // }
 
-    if (parent == new_parent) return;
+    // if (parent == new_parent) return;
 
     if (!confirm("Confirm change?")) {
-      self.val(parent);
+      self.val(default_val);
       return;
     }
 
@@ -289,7 +291,7 @@ jQuery(function() {
           done();
           if (res == 'not-found') {
             alert("Contribution " + id + " not found");
-            self.val(parent);
+            self.val(default_val);
           } else {
             window.location.reload();
           }

@@ -1,14 +1,18 @@
 td.contribution div { font-size:x-small; color:#666; }
-td.contribution:hover ul.smenu { visibility:visible; }
+td.contribution:hover .smenu { visibility:visible; }
 
-ul.smenu { float:right; font-size:x-small !important; visibility:hidden; }
-ul.smenu li { float:left; margin-left:10px; }
+.smenu { font-size:x-small !important; visibility:hidden; }
+.smenu li { float:left; margin-left:10px; }
 
-div.duplications strong { float:left; margin-right:10px; }
-div.duplications ul { font-size:x-small; }
-div.duplications ul li { display:block; float:left; margin-right:10px; }
-div.aggregated { clear:both; }
+div.duplications strong,
+div.children strong { clear:left; float:left; margin-right:10px; }
 
+div.duplications ul,
+div.children ul { font-size:x-small; }
+
+div.duplications ul li,
+div.children ul li { display:block; float:left; margin-right:10px;
+    line-height:200% !important; }
 
 .contribution textarea {
     width: 100%;
@@ -25,6 +29,10 @@ div.aggregated { clear:both; }
 
 .wpgd-part {
     background-color:#a9ffd1;
+}
+
+.wpgd-part .smenu {
+    visibility:visible;
 }
 
 .wpgd-status-bar {

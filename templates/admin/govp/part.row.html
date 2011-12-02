@@ -9,16 +9,9 @@
 
   <td class="contrib-status"
       id="contrib-status[{{contrib.id}}]">
-    <input type="checkbox"
-           {% if contrib.parent != 0 %}
-           style="display:none"
-           {% endif %}
-           {{contrib.status|replace({1:'checked',0:''})}}>
-    <span
-       {% if contrib.parent == 0 %}
-       style="display:none"
-       {% endif %}>
-      </span>
+    {% if exec("wpgd__can_be_approved", contrib) %}
+    <input type="checkbox" {{contrib.status|replace({1:'checked',0:''})}}>
+    {% endif %}
   </td>
 
   <td>
@@ -29,13 +22,6 @@
        value="{{ contrib.parent }}" style="width:95%">
     {% endif %}
   </td>
-
-  <!-- <td> -->
-  <!--   <input -->
-  <!--      type="text" id="contrib-part[{{contrib.id}}]" -->
-  <!--      class="contrib-parts contrib-part[{{contrib.part}}]" -->
-  <!--      value="{{ contrib.part }}" style="width:95%"> -->
-  <!-- </td> -->
 
   <td id="contrib-theme[{{contrib.id}}]"
       class="contrib-theme">
@@ -81,9 +67,16 @@
       <strong>Parent:</strong> #{{ contrib.parent }}
     </div>
     {% else %}
-    <ul class="smenu">
-      <li><a href="#">Add child</a></li>
-    </ul>
+    <div class="smenu">
+      <label>
+        <strong>Part of:</strong>
+        <input
+           default="{{ exec("wpgd__get_part_string", contrib) }}"
+           type="text" id="contrib-part[{{ contrib.id }}]"
+           class="contrib-parts contrib-part[{{ contrib.part }}]"
+           value="{{ exec("wpgd__get_parents_string", contrib) }}">
+      </label>
+    </div>
 
     {% if exec("wpgd_contrib_has_duplicates", contrib) %}
     <div class="duplications">
@@ -103,7 +96,7 @@
       <strong>Children:</strong>
       <ul>
         {% for i in exec("wpgd_contrib_get_children", contrib) %}
-        <li>{{ i.id }}</li>
+        <li><a href="#">#{{ i.id }}</a></li>
         {% endfor %}
       </ul>
     </div>

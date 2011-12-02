@@ -128,16 +128,15 @@ function wpgd_db_get_unique_contribs($sortby
 function wpgd_db_get_contrib($id) {
     global $wpdb;
     $sql = "
-      SELECT c.id, c.title, c.content, c.creation_date, c.theme, c.original, ".
-      " c.status, u.display_name, c.parent, c.moderation ".
-      " FROM contrib c, wp_users u ".
-      " WHERE c.user_id=u.ID AND c.enabled=true AND c.id=%d";
+      SELECT c.id, c.title, c.content, c.creation_date, c.theme, c.original,
+        c.status, u.display_name, c.parent, c.moderation
+      FROM contrib c, wp_users u
+      WHERE c.user_id=u.ID AND c.enabled=true AND c.id=%d";
 
     _wpgd_enter_encoding();
-    $res = $wpdb->get_var($wpdb->prepare($sql,array($id)));
+    $res = $wpdb->get_results($wpdb->prepare($sql, array($id)), ARRAY_A);
     _wpgd_leave_encoding();
-
-    return $res;
+    return count($res) > 0 ? $res[0] : null;
 }
 
 
@@ -204,22 +203,17 @@ function wpgd_contrib_has_duplicates($contrib) {
 
     $sql = "SELECT COUNT(*)
             FROM contrib
-            WHERE parent=${contrib[id]} AND enabled=1";
-
-    return $wpdb->get_var($wpdb->prepare($sql)) > 0;
+            WHERE parent=%d AND enabled=1";
+    return $wpdb->get_var($wpdb->prepare($sql, $contrib['id'])) > 0;
 }
 
 
 function wpgd_contrib_get_duplicates($contrib) {
     global $wpdb;
-
-    $sql = "SELECT *
-            FROM contrib
-            WHERE parent=${contrib[id]}
-              AND enabled=1";
+    $sql = "SELECT * FROM contrib WHERE parent=%d AND enabled=1";
 
     _wpgd_enter_encoding();
-    $res = $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+    $res = $wpdb->get_results($wpdb->prepare($sql, $contrib['id']), ARRAY_A);
     _wpgd_leave_encoding();
     return $res;
 }
@@ -251,14 +245,13 @@ function wpgd_contrib_get_all_duplicates($contrib) {
 }
 
 
-function wpgd_contrib_get_parent($contrib) {
+function wpgd_contrib_get_dup_parent($contrib) {
     global $wpdb;
 
     if ($contrib['parent'] == 0)
         return null;
-    $sql = "SELECT * FROM contrib
-            WHERE id=${contrib[parent]} AND enabled=1";
-    return $wpdb->get_var($wpdb->prepare($sql), ARRAY_A);
+    $sql = "SELECT * FROM contrib WHERE id=%d AND enabled=1";
+    return $wpdb->get_var($wpdb->prepare($sql, $contrib['parent']), ARRAY_A);
 }
 
 
@@ -285,4 +278,61 @@ function wpgd_contrib_get_authors($contrib) {
     return $ret;
 }
 
+/* -- Children API -- */
+
+function wpgd_contrib_append_part($contrib, $child) {
+    global $wpdb;
+    $wpdb->insert(
+        "contrib_children__contrib",
+        array("inverse_id"  => $contrib['id'],
+              "children_id" => $child['id'])
+    );
+}
+
+
+function wpgd_contrib_remove_part($contrib, $child) {
+    global $wpdb;
+    $sql = "DELETE FROM contrib_children__contrib WHERE
+      contrib_children__contrib.inverse_id = ${contrib[id]} AND
+      contrib_children__contrib.children_id = ${child[id]};";
+    $wpdb->query($wpdb->prepare($sql));
+}
+
+
+function wpgd_contrib_remove_all_parts($contrib) {
+    global $wpdb;
+    $sql = "DELETE FROM contrib_children__contrib WHERE
+      contrib_children__contrib.inverse_id = ${contrib[id]};";
+    $wpdb->query($wpdb->prepare($sql));
+}
+
+
+function wpgd_contrib_has_children($contrib) {
+    global $wpdb;
+    $sql = "SELECT count(*) FROM contrib, contrib_children__contrib
+      WHERE
+        contrib_children__contrib.inverse_id = ${contrib[id]} AND
+        contrib_children__contrib.children_id = contrib.id";
+    return $wpdb->get_var($wpdb->prepare($sql)) > 0;
+}
+
+
+function wpgd_contrib_get_children($contrib) {
+    global $wpdb;
+    $sql = "SELECT * FROM contrib, contrib_children__contrib
+      WHERE
+        contrib_children__contrib.inverse_id = ${contrib[id]} AND
+        contrib_children__contrib.children_id = contrib.id";
+    return $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+}
+
+
+function wpgd_contrib_get_parents($contrib) {
+    global $wpdb;
+    $sql = "SELECT * FROM contrib, contrib_children__contrib
+      WHERE
+        contrib_children__contrib.children_id = ${contrib[id]} AND
+        contrib_children__contrib.inverse_id = contrib.id";
+    return $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+}
 ?>

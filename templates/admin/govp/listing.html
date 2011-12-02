@@ -27,7 +27,6 @@
     {% endfor %}
   </ul>
 
-
   <form
      id="search" method="get" action="{{ pageurl }}"
      onsubmit="window.location.href+='&s='+document.forms.search.s.value; return false">
@@ -105,7 +104,6 @@
         <th style="width:3%"><a href="{{pageurl}}&sort=id">ID</a></th>
         <th style="width:4%"><a href="{{pageurl}}&sort=status">Status</a></th>
         <th style="width:8%">Duplicate</th>
-        <!-- <th style="width:8%">Part of</th> -->
         <th style="width:10%"><a href="{{pageurl}}&sort=theme">Theme</a></th>
         <th style="width:15%"><a href="{{pageurl}}&sort=title">Title</a></th>
         <th>Content</th>
@@ -125,7 +123,6 @@
         <th classs="manage-column sortable desc" scope="col">ID</th>
         <th classs="manage-column sortable desc" scope="col">Status</th>
         <th classs="manage-column sortable desc" scope="col">Duplicate of</th>
-        <!-- <th classs="manage-column sortable desc" scope="col">Part of</th> -->
         <th classs="manage-column sortable asc" scope="col">Theme</th>
         <th classs="manage-column sortable desc" scope="col">Title</th>
         <th classs="manage-column sortable asc" scope="col">Content</th>
