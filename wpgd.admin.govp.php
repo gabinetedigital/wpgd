@@ -227,6 +227,15 @@ function wpgd_update_contrib() {
         break;
     case 'part':
         if ($_POST['data']['part'] != "0") {
+            /* If the string comes empty the user want to nuke all
+             * children contribs, let's grant his/her wish */
+            if (empty($_POST['data']['part'])) {
+                foreach (wpgd_contrib_get_parents($org) as $parent) {
+                    wpgd_contrib_remove_part($parent, $org);
+                }
+                die('ok');
+            }
+
             $pids = explode(" ", $_POST['data']['part']);
 
             /* FIXME: avoid calling _get_contrib() twice for each
