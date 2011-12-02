@@ -27,6 +27,22 @@ function _wpgd_leave_encoding() {
     mysql_set_charset("utf8", $wpdb->dbh);
 }
 
+function _wpgd_get_contrib_results($sql, $argp = array()) {
+    global $wpdb;
+    _wpgd_enter_encoding();
+    $results = $wpdb->get_results($wpdb->prepare($sql,$argp), ARRAY_A);
+    _wpgd_leave_encoding();
+    return $results;
+}
+
+function _wpgd_get_contrib_row($sql, $argp = array()) {
+    global $wpdb;
+    _wpgd_enter_encoding();
+    $ret = $wpdb->get_row($wpdb->prepare($sql,$argp), ARRAY_A);
+    _wpgd_leave_encoding();
+    return $ret;
+}
+
 function wpgd_db_get_contribs($sortby,
                               $page,
                               $perpage,
@@ -100,10 +116,8 @@ function wpgd_db_get_contribs($sortby,
     $sql_main = $sql_head . $sql_base . "LIMIT $offset, $perpage";
     $sql_count = "SELECT COUNT(contrib.id) AS total " . $sql_base;
 
-    _wpgd_enter_encoding();
-    $results = $wpdb->get_results($wpdb->prepare($sql_main), ARRAY_A);
+    $results = _wpgd_get_contrib_results($sql_main);
     $count = $wpdb->get_var($wpdb->prepare($sql_count));
-    _wpgd_leave_encoding();
 
     return array($results, $count);
 }
@@ -133,10 +147,7 @@ function wpgd_db_get_contrib($id) {
       FROM contrib c, wp_users u
       WHERE c.user_id=u.ID AND c.enabled=true AND c.id=%d";
 
-    _wpgd_enter_encoding();
-    $res = $wpdb->get_results($wpdb->prepare($sql, array($id)), ARRAY_A);
-    _wpgd_leave_encoding();
-    return count($res) > 0 ? $res[0] : null;
+    return _wpgd_get_contrib_row($sql, array($id));
 }
 
 
@@ -212,10 +223,7 @@ function wpgd_contrib_get_duplicates($contrib) {
     global $wpdb;
     $sql = "SELECT * FROM contrib WHERE parent=%d AND enabled=1";
 
-    _wpgd_enter_encoding();
-    $res = $wpdb->get_results($wpdb->prepare($sql, $contrib['id']), ARRAY_A);
-    _wpgd_leave_encoding();
-    return $res;
+    return _wpgd_get_contrib_results($wpdb->prepare($sql, $contrib['id']));
 }
 
 
@@ -241,7 +249,7 @@ function wpgd_contrib_get_all_duplicates($contrib) {
                  parent=${contrib[id]})
              AND id<>${contrib[id]}
              AND enabled=1";
-    return $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+    return _wpgd_get_contrib_results($sql);
 }
 
 
@@ -251,7 +259,8 @@ function wpgd_contrib_get_dup_parent($contrib) {
     if ($contrib['parent'] == 0)
         return null;
     $sql = "SELECT * FROM contrib WHERE id=%d AND enabled=1";
-    return $wpdb->get_var($wpdb->prepare($sql, $contrib['parent']), ARRAY_A);
+
+    return _wpgd_get_contrib_row($sql, $contrib['parent']);
 }
 
 
@@ -323,7 +332,7 @@ function wpgd_contrib_get_children($contrib) {
       WHERE
         contrib_children__contrib.inverse_id = ${contrib[id]} AND
         contrib_children__contrib.children_id = contrib.id";
-    return $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+    return _wpgd_get_contrib_results($sql);
 }
 
 
@@ -333,6 +342,6 @@ function wpgd_contrib_get_parents($contrib) {
       WHERE
         contrib_children__contrib.children_id = ${contrib[id]} AND
         contrib_children__contrib.inverse_id = contrib.id";
-    return $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
+    return _wpgd_get_contrib_results($sql);
 }
 ?>
