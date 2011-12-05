@@ -147,4 +147,30 @@ function wpgd_pairwise_get_choice_votes($choice_id) {
 
     return array_pop(mysql_fetch_array($res));
 }
+
+function wpgd_pairwise_get_vote_count_grouped_by_date() {
+    $link = wpgd_pairwise_db_link();
+
+    $sql = "SELECT
+      year(v.created_at) AS year,
+      month(v.created_at) AS month,
+      day(v.created_at) AS day,
+      date(v.created_at) AS date,
+      count(v.id) AS count
+    FROM votes AS v GROUP BY DATE(v.created_at);";
+
+    $res = mysql_query($sql, $link);
+
+    if (!$res) {
+        throw new Exception(mysql_error($link));
+    }
+
+
+    $ret = array();
+    while ($row = mysql_fetch_array($res, MYSQL_ASSOC)) {
+        $ret[] = $row;
+    }
+
+    return $ret;
+}
 ?>

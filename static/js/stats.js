@@ -23,12 +23,17 @@
 
     $(function() {
         var data;
+        var xaxis_date_options = {
+          mode: "time",
+          timeformat: "%d/%m/%y"
+        };
 
         var $chart_byday = $("#chart_byday");
         data = $.map(getdata($chart_byday), function (item) {
-            return [[item.day, item.count]];
+            var date = new Date(item.year,item.month-1,item.day);
+            return [[date, item.count]];
         });
-        $.plot($chart_byday, [data]);
+        $.plot($chart_byday, [data], {xaxis: xaxis_date_options});
 
 
         var $chart_bytheme = $('#chart_bytheme');
@@ -37,7 +42,7 @@
         });
         $.plot($chart_bytheme, data, {
             series: {
-		pie: { 
+		pie: {
 		    show: true,
                     combine: {
                         color: '#999',
@@ -67,13 +72,14 @@
         data = (function () {
             var themes = {};
             $(getdata($chart_bythemedate)).each(function (index, item) {
+                var date = new Date(item.year,item.month-1,item.day);
                 var theme = item.theme || 'null';
                 if (themes[theme] === undefined) {
                     /* First time looking for this theme, it does not exist yet */
                     themes[theme] = [];
                 } else {
                     /* Just filling the already created array */
-                    themes[theme].push([ item.day, item.count ]);
+                    themes[theme].push([ date, item.count ]);
                 }
             });
 
@@ -95,10 +101,23 @@
             },
 
             legend: { noColumns: 2 },
-            xaxis: { tickDecimals: 0 },
+            xaxis: { tickDecimals: 0,
+                     mode: "time",
+                     timeformat: "%d/%m/%y"
+                   },
             yaxis: { min: 0 },
 
             selection: { mode: "x" }
         });
+
+
+
+        var $chart_votesbyday = $("#chart_votesbyday");
+        data = $.map(getdata($chart_votesbyday), function (item) {
+          var date = new Date(item.year,item.month-1,item.day);
+          return [[date, item.count]];
+        });
+
+      $.plot($chart_votesbyday, [data], {xaxis: xaxis_date_options});
     });
 })(jQuery);

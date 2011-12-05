@@ -363,4 +363,7 @@ function wpgd_db_get_contribs_sorted_by_score(
     return array($contribs, $count, $total_votes);
 }
 
+function wpgd_db_get_vote_count_grouped_by_date() {
+    return wpgd_pairwise_get_vote_count_grouped_by_date();
+}
 ?>

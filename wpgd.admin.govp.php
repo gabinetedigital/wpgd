@@ -179,6 +179,8 @@ function wpgd_govp_stats() {
         json_encode(wpgd_db_get_contrib_count_grouped_by_theme());
     $ctx['chart_bythemedate'] =
         json_encode(wpgd_db_get_contrib_count_grouped_by_themedate());
+    $ctx['chart_votebyday'] =
+        json_encode(wpgd_db_get_vote_count_grouped_by_date());
     echo $renderer->render('admin/govp/stats.html', $ctx);
 }
 
