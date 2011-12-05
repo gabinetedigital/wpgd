@@ -1,7 +1,5 @@
 <div class="wrap">
-  <h2>
-    Scores
-  </h2>
+  <h2>Scores</h2> Total votes: {{votes}}
 
   <table class="wp-list-table widefat audiences fixed"
          cellspacing="0">
@@ -15,6 +13,7 @@
         <th class="column-date" style="width:8%">
           Creation date</th>
         <th style="width:8%">Score</th>
+        <th style="width:8%">Votes</th>
       </tr>
     </thead>
     <tbody id="contrib-rows">
@@ -27,6 +26,7 @@
         <td>{{contrib.display_name}}</td>
         <td>{{contrib.creation_date|date("d/m/Y")}}</td>
         <td>{{contrib.score}}</td>
+        <td>{{contrib.votes}}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -40,6 +40,7 @@
         <th classs="manage-column sortable desc" scope="col">Author</th>
         <th classs="manage-column sortable desc" scope="col">Creation Date</th>
         <th classs="manage-column sortable desc" scope="col">Score</th>
+        <th classs="manage-column sortable desc" scope="col">Votes</th>
       </tr>
     </tfoot>
   </table>

@@ -104,11 +104,47 @@ function wpgd_pairwise_get_sorted_by_score($page, $perpage) {
 
     $ret = array();
     while ($row = mysql_fetch_array($res)) {
+        $row['votes'] = wpgd_pairwise_get_choice_votes($row['id']);
         $ret[] = $row;
     }
 
     $sql = "SELECT COUNT(id) $sql_base";
     $count = array_pop(mysql_fetch_array(mysql_query($wpdb->prepare($sql))));
-    return array($ret, $count);
+    $total_votes = wpgd_pairwise_get_total_votes();
+    return array($ret, $count, $total_votes);
+}
+
+function wpgd_pairwise_get_total_votes() {
+    global $wpdb;
+    $link = wpgd_pairwise_db_link();
+
+    $sql = "SELECT COUNT(votes.id)
+            FROM votes";
+    $res = mysql_query($sql, $link);
+
+    if (!$res) {
+        throw new Exception(mysql_error($link));
+    }
+
+    return array_pop(mysql_fetch_array($res));
+}
+
+function wpgd_pairwise_get_choice_votes($choice_id) {
+    global $wpdb;
+    $link = wpgd_pairwise_db_link();
+
+    $sql = $wpdb->prepare("SELECT COUNT(votes.id) as votes
+                           FROM votes, choices
+                           WHERE votes.choice_id=%d
+                             AND votes.choice_id=choices.id",
+                          array($choice_id));
+
+    $res = mysql_query($sql, $link);
+
+    if (!$res) {
+        throw new Exception(mysql_error($link));
+    }
+
+    return array_pop(mysql_fetch_array($res));
 }
 ?>

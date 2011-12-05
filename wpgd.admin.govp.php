@@ -188,7 +188,7 @@ function wpgd_govp_scores() {
 
     $ctx = array();
 
-    list($ctx['listing'], $ctx['count']) =
+    list($ctx['listing'], $ctx['count'], $ctx['votes']) =
         wpgd_db_get_contribs_sorted_by_score($page, WPGD_CONTRIBS_PER_PAGE);
 
     $ctx['siteurl'] = get_bloginfo('siteurl');

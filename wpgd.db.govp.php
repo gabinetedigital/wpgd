@@ -350,16 +350,17 @@ function wpgd_db_get_contribs_sorted_by_score(
                                          , $perpage = WPGD_CONTRIBS_PER_PAGE) {
 
 
-    list($scores, $count) = wpgd_pairwise_get_sorted_by_score($page, $perpage);
+    list($scores, $count, $total_votes) = wpgd_pairwise_get_sorted_by_score($page, $perpage);
     $contribs = array();
     foreach($scores as $sdata) {
         $json = json_decode($sdata['data']);
         $contrib = wpgd_db_get_contrib($json->id);
         $contrib['score'] = $sdata['score'];
+        $contrib['votes'] = $sdata['votes'];
         $contribs[] = $contrib;
     }
 
-    return array($contribs, $count);
+    return array($contribs, $count, $total_votes);
 }
 
 ?>
