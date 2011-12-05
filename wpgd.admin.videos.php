@@ -80,9 +80,14 @@ add_action('init', function () {
 
         /* Rendering the javascript content in the response */
         header('Content-Type: application/x-javascript; charset=UTF-8');
-        echo "var SOURCES_URL = '$sources';\n";
-        echo "var STATIC_URL = '$static';\n";
-        echo wpgd_servestatic_servejs($deps);
+        echo wpgd_servestatic_serve($deps);
+        die();
+    }
+
+    if (isset($_GET['wpgd/video/embedcss'])) {
+        $deps = array('videre/css/video-js.css');
+        header('Content-Type: text/css; charset=UTF-8');
+        echo wpgd_servestatic_serve($deps);
         die();
     }
 });
@@ -410,7 +415,7 @@ function wpgd_admin_videos_shortcode($atts){
         'id' => 'something',
      ), $atts));
 
-    return "<gd:video id=\"{$id}\"></gd:video>";
+    return "<video id=\"{$id}\"></video>";
 }
 add_shortcode('gdvideo', 'wpgd_admin_videos_shortcode');
 

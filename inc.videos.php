@@ -57,7 +57,8 @@ function wpgd_videos_get_video($vid) {
 function wpgd_videos_get_sources($vid) {
     global $wpdb;
     $table = $wpdb->prefix . "wpgd_admin_videos_sources";
-    $sql = "SELECT id, url, format FROM $table WHERE video_id = $vid";
+    $sql = "SELECT id, url, REPLACE(format, '\\\\', '') as format
+      FROM $table WHERE video_id = $vid";
     return $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
 }
 

@@ -91,10 +91,40 @@ function wpgd_getVideos($args) {
 }
 
 
+/**
+ * A wrapper for the function that gets a video by its id
+ *
+ * @param array $args Holds parameters to be passed to the actuall
+ *  function being wrapped and, in this case, you can pass the video id.
+ */
+function wpgd_getVideo($args) {
+    if (!is_array($args = _wpgd_method_header($args))) {
+        return $args;
+    }
+    return wpgd_videos_get_video($args[1]);
+}
+
+
+/**
+ * A wrapper for the function that lists the sources of a video
+ *
+ * @param array $args Holds parameters to be passed to the actuall
+ *  function being wrapped and, in this case, you can pass the video id.
+ */
+function wpgd_getVideoSources($args) {
+    if (!is_array($args = _wpgd_method_header($args))) {
+        return $args;
+    }
+    return wpgd_videos_get_sources($args[1]);
+}
+
+
 /* Filter that registers our methods in the wordpress xmlrpc provider */
 add_filter('xmlrpc_methods', function ($methods) {
+    $methods['wpgd.getVideo'] = 'wpgd_getVideo';
     $methods['wpgd.getVideos'] = 'wpgd_getVideos';
     $methods['wpgd.getHighlightedVideos'] = 'wpgd_getHighlightedVideos';
+    $methods['wpgd.getVideoSources'] = 'wpgd_getVideoSources';
     return $methods;
 });
 

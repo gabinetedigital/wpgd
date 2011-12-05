@@ -16,7 +16,7 @@
  */
 
 
-function wpgd_servestatic_servejs($list) {
+function wpgd_servestatic_serve($list) {
     $content = array();
     foreach ($list as $l) {
         $base = dirname(__FILE__) . '/static/';
