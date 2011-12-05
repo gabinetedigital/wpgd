@@ -22,7 +22,7 @@ function wpgd_videos_get_videos($where=null, $orderby=null, $limit=null, $offset
     $sql = "
       SELECT
         id, title, date, author, description, thumbnail,
-        status, highlight
+        status, highlight, video_width, video_height
       FROM $videos ";
     if (isset($where))
         $sql .= "WHERE $where ";
