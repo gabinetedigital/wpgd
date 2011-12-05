@@ -58,8 +58,42 @@ function wpgd_getHighlightedVideos($args) {
 }
 
 
+/**
+ * A wrapper for the function that lists videos
+ *
+ * @param array $args Holds parameters to be passed to the actuall
+ *  function being wrapped. Please see the wpgd_videos_get_videos()
+ *  function for a deeper description.
+ */
+function wpgd_getVideos($args) {
+    if (!is_array($args = _wpgd_method_header($args))) {
+        return $args;
+    }
+
+    /* Just making sure that we can keep rocking */
+    if (!isset($args[0]))
+        $args[0] = array();
+
+    /* These are the parameters that we're waiting for */
+    $names = array('where', 'orderby', 'limit', 'offset');
+    $params = array();
+
+    /* Getting params from the $args array */
+    for ($i = 0; $i < count($names); $i++) {
+        if (array_key_exists($names[$i], $args[0])) {
+            $params[$i] = $args[0][$names[$i]];
+        } else {
+            $params[$i] = null;
+        }
+    }
+
+    return call_user_func_array('wpgd_videos_get_videos', $params);
+}
+
+
 /* Filter that registers our methods in the wordpress xmlrpc provider */
 add_filter('xmlrpc_methods', function ($methods) {
+    $methods['wpgd.getVideos'] = 'wpgd_getVideos';
     $methods['wpgd.getHighlightedVideos'] = 'wpgd_getHighlightedVideos';
     return $methods;
 });
