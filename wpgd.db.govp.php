@@ -357,6 +357,8 @@ function wpgd_db_get_contribs_sorted_by_score(
         $contrib = wpgd_db_get_contrib($json->id);
         $contrib['score'] = $sdata['score'];
         $contrib['votes'] = $sdata['votes'];
+        $contrib['won'] = $sdata['won'];
+        $contrib['lost'] = $sdata['lost'];
         $contribs[] = $contrib;
     }
 

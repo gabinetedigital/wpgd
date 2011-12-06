@@ -14,6 +14,7 @@
           Creation date</th>
         <th style="width:8%">Score</th>
         <th style="width:8%">Votes</th>
+        <th style="width:8%">Won/Lost</th>
       </tr>
     </thead>
     <tbody id="contrib-rows">
@@ -27,6 +28,7 @@
         <td>{{contrib.creation_date|date("d/m/Y")}}</td>
         <td>{{contrib.score}}</td>
         <td>{{contrib.votes}}</td>
+        <td>{{contrib.won}}/{{contrib.lost}}</td>
       </tr>
       {% endfor %}
     </tbody>
@@ -41,6 +43,7 @@
         <th classs="manage-column sortable desc" scope="col">Creation Date</th>
         <th classs="manage-column sortable desc" scope="col">Score</th>
         <th classs="manage-column sortable desc" scope="col">Votes</th>
+        <th classs="manage-column sortable desc" scope="col">Won/Lost</th>
       </tr>
     </tfoot>
   </table>

@@ -105,6 +105,8 @@ function wpgd_pairwise_get_sorted_by_score($page, $perpage) {
     $ret = array();
     while ($row = mysql_fetch_array($res)) {
         $row['votes'] = wpgd_pairwise_get_choice_votes($row['id']);
+        $row['won'] = wpgd_pairwise_get_choice_wins($row['id']);
+        $row['lost'] = wpgd_pairwise_get_choice_losts($row['id']);
         $ret[] = $row;
     }
 
@@ -135,8 +137,43 @@ function wpgd_pairwise_get_choice_votes($choice_id) {
 
     $sql = $wpdb->prepare("SELECT COUNT(votes.id) as votes
                            FROM votes, choices
-                           WHERE votes.choice_id=%d
                              AND votes.choice_id=choices.id",
+                          array($choice_id));
+
+    $res = mysql_query($sql, $link);
+
+    if (!$res) {
+        throw new Exception(mysql_error($link));
+    }
+
+    return array_pop(mysql_fetch_array($res));
+}
+
+function wpgd_pairwise_get_choice_wins($choice_id) {
+    global $wpdb;
+    $link = wpgd_pairwise_db_link();
+
+    $sql = $wpdb->prepare("SELECT COUNT(votes.id) as votes
+                           FROM votes
+                           WHERE choice_id=%d",
+                          array($choice_id));
+
+    $res = mysql_query($sql, $link);
+
+    if (!$res) {
+        throw new Exception(mysql_error($link));
+    }
+
+    return array_pop(mysql_fetch_array($res));
+}
+
+function wpgd_pairwise_get_choice_losts($choice_id) {
+    global $wpdb;
+    $link = wpgd_pairwise_db_link();
+
+    $sql = $wpdb->prepare("SELECT COUNT(votes.id) as votes
+                           FROM votes
+                           WHERE loser_choice_id=%d",
                           array($choice_id));
 
     $res = mysql_query($sql, $link);
