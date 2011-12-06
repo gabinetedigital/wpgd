@@ -23,11 +23,11 @@ function wpgd_pairwise_send_contrib($contrib) {
   global $PAIRWISE_CREATE_CHOICE_URL;
 
   $json = array(
-                'id' => $contrib->id,
-                'title' => $contrib->title);
+                'id' => $contrib['id'],
+                'title' => $contrib['title']);
 
   $url = $PAIRWISE_CREATE_CHOICE_URL;
-  $url = str_replace("<qid>",$PAIRWISE_THEMES[$contrib->theme], $url);
+  $url = str_replace("<qid>",$PAIRWISE_THEMES[$contrib['theme']], $url);
   $url = str_replace("<text>",urlencode(json_encode($json)), $url);
   $req =& new HTTP_Request($url);
   $req->setMethod(HTTP_REQUEST_METHOD_POST);
