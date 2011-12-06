@@ -350,7 +350,7 @@ function wpgd_db_get_contribs_sorted_by_score(
                                          , $perpage = WPGD_CONTRIBS_PER_PAGE) {
 
 
-    list($scores, $count, $total_votes) = wpgd_pairwise_get_sorted_by_score($page, $perpage);
+    list($scores, $count, $total_votes) = wpgd_pairwise_get_sorted_by_score($page-1, $perpage);
     $contribs = array();
     foreach($scores as $sdata) {
         $json = json_decode($sdata['data']);

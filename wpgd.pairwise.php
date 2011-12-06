@@ -94,7 +94,7 @@ function wpgd_pairwise_get_sorted_by_score($page, $perpage) {
                  ORDER BY score desc";
 
     $sql = $wpdb->prepare("SELECT id, score, data $sql_base LIMIT %d, %d",
-                          array($page, $perpage));
+                          array($page*$perpage, $perpage));
 
     $res = mysql_query($sql, $link);
 
