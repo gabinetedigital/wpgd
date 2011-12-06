@@ -135,10 +135,11 @@ function wpgd_pairwise_get_choice_votes($choice_id) {
     global $wpdb;
     $link = wpgd_pairwise_db_link();
 
-    $sql = $wpdb->prepare("SELECT COUNT(votes.id) as votes
-                           FROM votes, choices
-                             AND votes.choice_id=choices.id",
-                          array($choice_id));
+    $sql = $wpdb->prepare("SELECT COUNT(id) as votes
+                           FROM votes
+                           WHERE choice_id=%d
+                            OR loser_choice_id=%d",
+                          array($choice_id,$choice_id));
 
     $res = mysql_query($sql, $link);
 
