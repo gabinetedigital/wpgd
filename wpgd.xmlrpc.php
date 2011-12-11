@@ -119,12 +119,35 @@ function wpgd_getVideoSources($args) {
 }
 
 
+/* ---- Pairwise API ---- */
+
+
+/**
+ * A wrapper for the function that gets pairwise choices sorted by its
+ * scores.
+ *
+ * @param array $args Holds parameters to be passed to the actuall
+ *  function being wrapped and, in this case, you need to pass the
+ *  `page', the `perpage' and `theme' params.
+ */
+function pairwise_getSortedByScore($args) {
+    if (!is_array($args = _wpgd_method_header($args))) {
+        return $args;
+    }
+
+    return wpgd_pairwise_get_sorted_by_score($args[1], $args[2], $args[3]);
+}
+
+
+
 /* Filter that registers our methods in the wordpress xmlrpc provider */
 add_filter('xmlrpc_methods', function ($methods) {
     $methods['wpgd.getVideo'] = 'wpgd_getVideo';
     $methods['wpgd.getVideos'] = 'wpgd_getVideos';
     $methods['wpgd.getHighlightedVideos'] = 'wpgd_getHighlightedVideos';
     $methods['wpgd.getVideoSources'] = 'wpgd_getVideoSources';
+
+    $methods['pairwise.getSortedByScore'] = 'pairwise_getSortedByScore';
     return $methods;
 });
 

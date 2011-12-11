@@ -85,13 +85,19 @@ function wpgd_pairwise_get_results($sql, $argp = array()) {
     return $ret;
 }
 
-function wpgd_pairwise_get_sorted_by_score($page, $perpage) {
+function wpgd_pairwise_get_sorted_by_score($page, $perpage, $theme=null) {
     global $wpdb;
+    global $PAIRWISE_THEMES;
 
     $link = wpgd_pairwise_db_link();
+    $sql_base = "FROM choices";
 
-    $sql_base = "FROM choices
-                 ORDER BY score desc";
+    if ($theme != null) {
+        $theme_id = $PAIRWISE_THEMES[$theme];
+        $sql_base .= " WHERE question_id = $theme_id ";
+    }
+
+    $sql_base .=  "ORDER BY score DESC";
 
     $sql = $wpdb->prepare("SELECT id, score, data $sql_base LIMIT %d, %d",
                           array($page*$perpage, $perpage));
