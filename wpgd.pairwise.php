@@ -90,7 +90,7 @@ function wpgd_pairwise_get_sorted_by_score($page, $perpage, $theme=null) {
     global $PAIRWISE_THEMES;
 
     $link = wpgd_pairwise_db_link();
-    $sql_base = "FROM choices";
+    $sql_base = "FROM choices ";
 
     if ($theme != null) {
         $theme_id = $PAIRWISE_THEMES[$theme];
