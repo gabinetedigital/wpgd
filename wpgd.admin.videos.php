@@ -413,9 +413,11 @@ function _process_add() {
 function wpgd_admin_videos_shortcode($atts){
     extract(shortcode_atts( array(
         'id' => 'something',
+        'width' => '490',
+        'height' => '290'
      ), $atts));
 
-    return "<video id=\"{$id}\"></video>";
+    return "<video id=\"$id\" width=\"$width\" height=\"$height\"></video>";
 }
 add_shortcode('gdvideo', 'wpgd_admin_videos_shortcode');
 
