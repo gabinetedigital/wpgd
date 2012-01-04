@@ -22,19 +22,19 @@ $renderer = new WpGdTemplatingRenderer();
 add_action('admin_menu', 'wpgd_menu');
 
 function wpgd_menu() {
-    $menupage = __FILE__;
+    /* $menupage = __FILE__; */
 
-    add_menu_page(
-        'Gabinete Digital', 'Gabinete Digital', 'administrator',
-        $menupage, 'wpgd_menu_page');
+    /* add_menu_page( */
+    /*     'Gabinete Digital', 'Gabinete Digital', 'administrator', */
+    /*     $menupage, 'wpgd_menu_page'); */
 
-    add_submenu_page(
-        $menupage, 'Gabinete Digital &mdash; Audience', 'Audience',
-        'manage_options', 'gd-audience', 'wpgd_submenu_audience');
+    /* add_submenu_page( */
+    /*     $menupage, 'Gabinete Digital &mdash; Audience', 'Audience', */
+    /*     'manage_options', 'gd-audience', 'wpgd_submenu_audience'); */
 
-    add_submenu_page(
-        $menupage, 'Gabinete Digital &mdash; Gallery', 'Gallery',
-        'manage_options', 'gd-gallery', 'wpgd_submenu_gallery');
+    /* add_submenu_page( */
+    /*     $menupage, 'Gabinete Digital &mdash; Gallery', 'Gallery', */
+    /*     'manage_options', 'gd-gallery', 'wpgd_submenu_gallery'); */
 }
 
 
