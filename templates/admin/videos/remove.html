@@ -1,0 +1,21 @@
+<div class="wrap">
+  <h2>Are you sure you want to remove the following video?</h2>
+
+  <div style="margin:20px; width:50%;">
+    <img src="{{ video.thumbnail }}" width="100"
+         style="float:left; margin-right:10px;">
+    <h3 style="margin-top:0;">{{ video.title }}</h3>
+    <p class="desc">{{ video.description }}</p>
+  </div>
+
+  <p class="submit">
+    <a href="admin.php?page=gd-videos-remove&video_id={{ video.id }}&screwu=1"
+       class="button"><strong>Yes</strong>, I'm sure!</a>
+
+    <a href="admin.php?page=wpgd/wpgd.admin.videos.php"
+       class="button submitdelete">
+      <strong style="color:red">No</strong>, take me out of here without
+      touching anything!
+    </a>
+  </p>
+</div>

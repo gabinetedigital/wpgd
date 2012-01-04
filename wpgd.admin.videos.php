@@ -29,6 +29,14 @@ $renderer = new WpGdTemplatingRenderer();
 add_action('init', function () {
     global $renderer;
 
+    /* Nasty wordpress. I can't redirect the user if headers were
+       already sent. It means that I'll not be able to do the following
+       redirect from the `right' place: _process_remove() */
+    if (isset($_GET['screwu'])) {
+        wpgd_videos_remove_video($_GET['video_id']);
+        header('Location: admin.php?page=wpgd/wpgd.admin.videos.php');
+    }
+
     if (is_admin()) {
         /* javascripts */
         wp_enqueue_script('jquery');
@@ -115,6 +123,10 @@ function wpgd_videos_menu() {
     add_submenu_page(
         null, 'Edit Video', 'Edit Video',
         'manage_options', 'gd-videos-edit', 'wpgd_videos_submenu_edit');
+
+    add_submenu_page(
+        null, 'Remove video', 'Remove video', 'manage_options',
+        'gd-videos-remove', 'wpgd_videos_submenu_remove');
 }
 
 
@@ -137,6 +149,10 @@ function wpgd_videos_submenu_edit() {
     echo $renderer->render('admin/videos/add.html', _process_edit());
 }
 
+function wpgd_videos_submenu_remove() {
+    global $renderer;
+    echo $renderer->render('admin/videos/remove.html', _process_remove());
+}
 
 function wpgd_videos_submenu_home() {
     global $renderer;
@@ -275,6 +291,17 @@ function _process_edit() {
     }
 
     $ctx['fields']['id'] = $video_id;
+    return $ctx;
+}
+
+
+function _process_remove() {
+    /* Please, note that the actual call for wpgd_videos_remove_video()
+       is placed in the "action init" on the top of this module because
+       of a nasty redirect issue explained there. Please, don't blame
+       me. */
+    $ctx = array();
+    $ctx['video'] = wpgd_videos_get_video($_GET['video_id']);
     return $ctx;
 }
 

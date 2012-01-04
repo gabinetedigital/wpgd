@@ -62,4 +62,12 @@ function wpgd_videos_get_sources($vid) {
     return $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
 }
 
+
+function wpgd_videos_remove_video($vid) {
+    global $wpdb;
+    $table = $wpdb->prefix . "wpgd_admin_videos";
+    $sql = "DELETE FROM $table WHERE id = %s";
+    return $wpdb->query($wpdb->prepare($sql, $vid));
+}
+
 ?>
