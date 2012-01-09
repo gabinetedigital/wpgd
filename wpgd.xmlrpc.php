@@ -29,6 +29,9 @@ function _wpgd_method_header(&$args) {
     global $wp_xmlrpc_server;
     $wp_xmlrpc_server->escape( $args );
 
+    // getting rid of blog_id
+    array_shift($args);
+
     // Reading the attribute list
     $username = array_shift($args);
     $password = array_shift($args);
