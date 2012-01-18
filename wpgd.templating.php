@@ -16,7 +16,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 
-include 'Twig/Autoloader.php';
+require_once 'Twig/Autoloader.php';
 Twig_Autoloader::register();
 
 /**
