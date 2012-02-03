@@ -142,6 +142,53 @@ function pairwise_getSortedByScore($args) {
 }
 
 
+/* ---- Gallery related API ---- */
+
+
+function wpgd_getGalleries($args) {
+    if (!is_array($args = _wpgd_method_header($args))) {
+        return $args;
+    }
+
+    global $nggdb;
+
+    /* Actually getting the gallery list */
+    $galleries = $nggdb->find_all_galleries();
+    $result = array();
+
+    /* Getting the preview pic in the same request of the listing */
+    foreach ($galleries as $g) {
+        $g->front = $nggdb->find_image($g->previewpic);
+        $result[] = $g;
+    }
+    return $result;
+}
+
+
+function wpgd_getGallery($args) {
+    if (!is_array($args = _wpgd_method_header($args))) {
+        return $args;
+    }
+
+    global $nggdb;
+
+    $result = array();
+    foreach ($nggdb->get_gallery($args[1]) as $image) {
+        $result[] = $image;
+    }
+    return $result;
+}
+
+
+function wpgd_getImage($args) {
+    if (!is_array($args = _wpgd_method_header($args))) {
+        return $args;
+    }
+
+    global $nggdb;
+    return $nggdb->find_image($args[1]);
+}
+
 
 /* Filter that registers our methods in the wordpress xmlrpc provider */
 add_filter('xmlrpc_methods', function ($methods) {
@@ -149,7 +196,9 @@ add_filter('xmlrpc_methods', function ($methods) {
     $methods['wpgd.getVideos'] = 'wpgd_getVideos';
     $methods['wpgd.getHighlightedVideos'] = 'wpgd_getHighlightedVideos';
     $methods['wpgd.getVideoSources'] = 'wpgd_getVideoSources';
-
+    $methods['wpgd.getGalleries'] = 'wpgd_getGalleries';
+    $methods['wpgd.getGallery'] = 'wpgd_getGallery';
+    $methods['wpgd.getImage'] = 'wpgd_getImage';
     $methods['pairwise.getSortedByScore'] = 'pairwise_getSortedByScore';
     return $methods;
 });
