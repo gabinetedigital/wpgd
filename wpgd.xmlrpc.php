@@ -172,9 +172,10 @@ function wpgd_getGallery($args) {
 
     global $nggdb;
 
-    $result = array();
+    $result = $nggdb->find_gallery($args[1]);
+    $result->images = array();
     foreach ($nggdb->get_gallery($args[1]) as $image) {
-        $result[] = $image;
+        $result->images[] = $image;
     }
     return $result;
 }
