@@ -4,6 +4,7 @@
   <table class="wp-list-table widefat fixed audiences" cellspacing="0">
     <thead>
       <tr>
+      	<th style="width:5%">ID</th>
         <th style="width:10%">Thumbnail</th>
         <th>Title</th>
         <th>Summary</th>
@@ -13,6 +14,7 @@
     <tbody>
       {% for video in listing %}
       <tr>
+      	<td><a href="admin.php?page=gd-videos-edit&video_id={{ video.id }}">{{ video.id }}</a></td>
         <td>
           <a href="admin.php?page=gd-videos-edit&video_id={{ video.id }}">
             <img alt="{{ video.title }}" src="{{ video.thumbnail }}"
