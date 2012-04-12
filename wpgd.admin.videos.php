@@ -349,11 +349,12 @@ function __validate_form() {
     /* Validating the source received from the form */
     $_validated_sources = __validate_sources();
     $sources = $_validated_sources['sources'];
-    $incomplete_sources = $_validated_sources['incomplete_sources'];
-
+    $incomplete_sources = $_validated_sources['incomplete_sources'];  
+        
+    
     try {
         $fields = _validate_array($video_fields);
-
+        
         /* Maybe it's everything ok with the normal fields, but
            let's find out what happened in the source list
            validation */
@@ -363,9 +364,16 @@ function __validate_form() {
         return array('sources' => $sources, 'fields' => $fields);
 
     } catch (ValidationException $exc) {
+    	
+    	$array = $_POST;
+    	
+    	foreach ($video_fields as $item) {
+    		$clear[$item] = stripslashes(trim($array[$item]));    		
+    	}
+    	
         throw new ValidationException(array(
             'errors' => $exc->getErrors(),
-            'fields' => $_POST,
+            'fields' => $clear,
             'source_fields' => array_merge($sources, $incomplete_sources),
             'source_incomplete' => $incomplete_sources
         ));
@@ -395,8 +403,8 @@ function _process_add() {
     /* Date field handling */
     /* FIXME: hardcoded date format */
     $date = date_format(date_create_from_format(
-        "d/m/Y", $fields['date']), 'Y-m-d H:i:s');
-
+        "d/m/Y", $fields['date']), 'Y-m-d H:i:s');    
+    
     /* Finally, inserting the video */
     $wpdb->insert(
         $videos_table,
