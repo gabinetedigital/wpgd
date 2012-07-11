@@ -191,6 +191,20 @@ function wpgd_getImage($args) {
 }
 
 
+function wpgd_getLastFromGallery($args) {
+    if (!is_array($args = _wpgd_method_header($args))) {
+        return $args;
+    }
+    
+    global $nggdb;
+    $galery = $nggdb->get_gallery($args[1], 'imagedate', 'DESC');
+    if( $galery && is_array($galery) ){
+        return $galery[1];
+    }else{
+        return $galery;
+    }
+}
+
 /* Filter that registers our methods in the wordpress xmlrpc provider */
 add_filter('xmlrpc_methods', function ($methods) {
     $methods['wpgd.getVideo'] = 'wpgd_getVideo';
@@ -200,6 +214,7 @@ add_filter('xmlrpc_methods', function ($methods) {
     $methods['wpgd.getGalleries'] = 'wpgd_getGalleries';
     $methods['wpgd.getGallery'] = 'wpgd_getGallery';
     $methods['wpgd.getImage'] = 'wpgd_getImage';
+    $methods['wpgd.getLastFromGallery'] = 'wpgd_getLastFromGallery';
     $methods['pairwise.getSortedByScore'] = 'pairwise_getSortedByScore';
     return $methods;
 });
