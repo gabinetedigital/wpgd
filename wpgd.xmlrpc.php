@@ -199,7 +199,10 @@ function wpgd_getLastFromGallery($args) {
     global $nggdb;
     $galery = $nggdb->get_gallery($args[1], 'imagedate', 'DESC');
     if( $galery && is_array($galery) ){
-        return $galery[1];
+        foreach ($galery as $key => $value) {
+            return $galery[$key] ;
+            break;
+        }
     }else{
         return $galery;
     }
