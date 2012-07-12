@@ -208,6 +208,32 @@ function wpgd_getLastFromGallery($args) {
     }
 }
 
+function wpgd_searchGalleries($args) {
+    if (!is_array($args = _wpgd_method_header($args))) {
+        return $args;
+    }
+
+    global $nggdb;
+
+    error_log("Arguments::");
+    error_log( print_r($args, true) );
+    error_log('Procurando por::::'.$args[1]);
+    
+    $galleries = $nggdb->search_for_galleries($args[1]);
+    
+    error_log( print_r($galleries, true) );
+    
+    $result = array();
+
+    /* Getting the preview pic in the same request of the listing */
+    foreach ($galleries as $g) {
+        $g->front = $nggdb->find_image($g->previewpic);
+        $result[] = $g;
+    }
+    return $result;
+}
+
+
 /* Filter that registers our methods in the wordpress xmlrpc provider */
 add_filter('xmlrpc_methods', function ($methods) {
     $methods['wpgd.getVideo'] = 'wpgd_getVideo';
@@ -218,6 +244,7 @@ add_filter('xmlrpc_methods', function ($methods) {
     $methods['wpgd.getGallery'] = 'wpgd_getGallery';
     $methods['wpgd.getImage'] = 'wpgd_getImage';
     $methods['wpgd.getLastFromGallery'] = 'wpgd_getLastFromGallery';
+    $methods['wpgd.searchGalleries'] = 'wpgd_searchGalleries';
     $methods['pairwise.getSortedByScore'] = 'pairwise_getSortedByScore';
     return $methods;
 });
