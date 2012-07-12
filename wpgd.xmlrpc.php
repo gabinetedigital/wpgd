@@ -215,13 +215,7 @@ function wpgd_searchGalleries($args) {
 
     global $nggdb;
 
-    error_log("Arguments::");
-    error_log( print_r($args, true) );
-    error_log('Procurando por::::'.$args[1]);
-    
     $galleries = $nggdb->search_for_galleries($args[1]);
-    
-    error_log( print_r($galleries, true) );
     
     $result = array();
 
