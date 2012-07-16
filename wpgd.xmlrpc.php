@@ -171,12 +171,15 @@ function wpgd_getGallery($args) {
     }
 
     global $nggdb;
+    global $nggv;
 
     $result = $nggdb->find_gallery($args[1]);
     $result->images = array();
     foreach ($nggdb->get_gallery($args[1]) as $image) {
         $result->images[] = $image;
     }
+    $result->avg = nggv_getVotingResults($result->gid, array("avg"=>true, "list"=>false, "number"=>false, "likes"=>false, "dislikes"=>false))['avg'] ;
+    $result->usercanvote = nggv_canVote($result->gid); #Verifica se a galeria pode ser votada
     return $result;
 }
 
