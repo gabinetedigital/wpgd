@@ -178,8 +178,11 @@ function wpgd_getGallery($args) {
     foreach ($nggdb->get_gallery($args[1]) as $image) {
         $result->images[] = $image;
     }
-    $result->avg = nggv_getVotingResults($result->gid, array("avg"=>true, "list"=>false, "number"=>false, "likes"=>false, "dislikes"=>false))['avg'] ;
-    $result->usercanvote = nggv_canVote($result->gid); #Verifica se a galeria pode ser votada
+    // $result->avg = nggv_getVotingResults($result->gid, array("avg"=>true, "list"=>false, "number"=>false, "likes"=>false, "dislikes"=>false))['avg'] ;
+    // $result->usercanvote = nggv_canVote($result->gid); #Verifica se a galeria pode ser votada
+    $result->avg = 0;
+    $result->usercanvote = true;
+
     return $result;
 }
 
