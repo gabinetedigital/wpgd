@@ -153,7 +153,7 @@ function wpgd_getGalleries($args) {
     global $nggdb;
 
     /* Actually getting the gallery list */
-    $galleries = $nggdb->find_all_galleries();
+    $galleries = $nggdb->find_all_galleries('gid', 'DESC', TRUE);
     $result = array();
 
     /* Getting the preview pic in the same request of the listing */
