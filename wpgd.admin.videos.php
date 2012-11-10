@@ -452,7 +452,33 @@ function wpgd_admin_videos_shortcode($atts){
         'height' => '290'
      ), $atts));
 
-    return "<video id=\"$id\" width=\"$width\" height=\"$height\"></video>";
+    $video = wpgd_videos_get_video($id);
+    $sources = wpgd_videos_get_sources($id);
+
+    foreach ( $sources as $s ){
+        if( strpos( $s['format'] ,'ogg') > 0 ){
+            $url_video_ogg = $s['url'];
+        }
+        if( strpos( $s['format'] ,'mp4') > 0 ){
+            $url_video_mp4 = $s['url'];
+        }
+        if( strpos( $s['format'] ,'webm') > 0 ){
+            $url_video_webm = $s['url'];
+        }
+    }
+    
+    $txtreturn  = "\n<video id=\"$id\" poster=\"".$video['thumbnail']."\" width=\"$width\" height=\"$height\">";
+
+    $txtreturn .= "\n   <source src=\"".$url_video_ogg."\" type=\"video/ogg\" />";
+    $txtreturn .= "\n   <source src=\"".$url_video_mp4."\" type=\"video/mp4\" />";
+    $txtreturn .= "\n   <source src=\"".$url_video_webm."\" type=\"video/webm\" />";
+    $txtreturn .= "\nYour browser does not support the video tag.";
+
+    $txtreturn .= "\n</video>\n";
+
+
+
+    return $txtreturn;
 }
 add_shortcode('gdvideo', 'wpgd_admin_videos_shortcode');
 
