@@ -469,7 +469,9 @@ function wpgd_admin_videos_shortcode($atts){
     
     $txtreturn  = "\n<video id=\"$id\" poster=\"".$video['thumbnail']."\" width=\"$width\" height=\"$height\">";
 
-    $txtreturn .= "\n   <source src=\"".$url_video_ogg."\" type=\"video/ogg\" />";
+    if( $url_video_ogg != "" ){
+        $txtreturn .= "\n   <source src=\"".$url_video_ogg."\" type=\"video/ogg\" />";
+    }
     $txtreturn .= "\n   <source src=\"".$url_video_mp4."\" type=\"video/mp4\" />";
     $txtreturn .= "\n   <source src=\"".$url_video_webm."\" type=\"video/webm\" />";
     $txtreturn .= "\nYour browser does not support the video tag.";
