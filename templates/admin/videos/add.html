@@ -238,8 +238,23 @@
               video.
             </p>
           </div>
-        </div> <!-- #col-left -->
 
+
+          <div class="form-field form-required">
+            <label>Category</label>
+
+            <select name="category">
+              <option value="0"> - Sem categoria - </option>
+              {%if terms%}
+                {% for term in terms%}
+                  <option value="{{ term.term_id }}" {%if term.term_id == fields.category %}selected="selected"{%endif%}>{{ term.name }}</option>
+                {% endfor %}
+              {%endif%}
+            </select>
+
+          </div>
+
+        </div> <!-- #col-left -->
 
         <p class="submit">
           <button class="button">

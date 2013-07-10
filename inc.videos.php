@@ -21,7 +21,7 @@ function wpgd_videos_get_videos($where=null, $orderby=null, $limit=null, $offset
     $videos = $wpdb->prefix . "wpgd_admin_videos";
     $sql = "
       SELECT
-        id, title, date, author, description, thumbnail,
+        id, title, date, author, description, thumbnail, category,
         status, highlight, video_width, video_height
       FROM $videos ";
     if (isset($where))
@@ -46,7 +46,7 @@ function wpgd_videos_get_video($vid) {
     $table = $wpdb->prefix . "wpgd_admin_videos";
     $sql = "
       SELECT
-        id, title, date, author, description, thumbnail,
+        id, title, date, author, description, thumbnail, category,
         status, video_width, video_height
       FROM $table
       WHERE id = " . $vid;

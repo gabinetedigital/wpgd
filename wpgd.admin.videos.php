@@ -29,6 +29,33 @@ $renderer = new WpGdTemplatingRenderer();
 add_action('init', function () {
     global $renderer;
 
+    register_taxonomy('video_category', null, array(
+        // Hierarchical taxonomy (like categories)
+        'hierarchical' => false,
+        // This array of options controls the labels displayed in the WordPress Admin UI
+        'show_in_nav_menus' => true,
+        'show_ui' => true,
+        'labels' => array(
+            'name' => _x( 'Categoria de Vídeo', 'taxonomy general name' ),
+            'singular_name' => _x( 'Categoria', 'taxonomy singular name' ),
+            'search_items' =>  __( 'Procurar categorias' ),
+            'all_items' => __( 'Todas as categorias' ),
+            'parent_item' => __( 'Categoria pai' ),
+            'parent_item_colon' => __( 'Categoria pai:' ),
+            'edit_item' => __( 'Editar Categoria' ),
+            'update_item' => __( 'Alterar Categoria' ),
+            'add_new_item' => __( 'Adicionar nova Categoria' ),
+            'new_item_name' => __( 'Nome da nova Categoria' ),
+            'menu_name' => __( 'Categorias' ),
+        ),
+        // Control the slugs used for this taxonomy
+        'rewrite' => array(
+            'slug' => 'video_category', // This controls the base slug that will display before each term
+            'with_front' => false, // Don't display the category base before "/video_category/"
+            'hierarchical' => true // This will allow URL's like "/video_category/category1/"
+        ),
+    ));
+
     /* Nasty wordpress. I can't redirect the user if headers were
        already sent. It means that I'll not be able to do the following
        redirect from the `right' place: _process_remove() */
@@ -116,7 +143,12 @@ function wpgd_videos_menu() {
         $menupage, 'Add New', 'Add New',
         'manage_options', 'gd-videos-add', 'wpgd_videos_submenu_add');
 
-    add_submenu_page(
+    // 'edit-tags.php?taxonomy=video_category',
+    add_submenu_page( 
+        $menupage, 'Categories', 'Categories',
+        'manage_options', 'edit-tags.php?taxonomy=video_category');
+
+    add_submenu_page( 
         $menupage, 'Videos in home', 'Videos in home',
         'manage_options', 'gd-videos-home', 'wpgd_videos_submenu_home');
 
@@ -159,12 +191,16 @@ function wpgd_videos_submenu_home() {
     echo $renderer->render('admin/videos/home.html', _process_home());
 }
 
+function wpgd_videos_submenu_categ() {
+    global $renderer;
+    echo $renderer->render('edit-tags.php?taxonomy=video_category', _process_home());
+}
 
 /* -- Functions that process the requests of the above views -- */
 
 
 $video_fields = array(
-    'title', 'date', 'author', 'license', 'description',
+    'title', 'date', 'author', 'license', 'description', 'category',
     'video_width', 'video_height', 'thumbnail'
 );
 
@@ -208,6 +244,7 @@ function _process_edit() {
 
 
     if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
         /* Validating the rest of the form */
         try {
             $_validated = __validate_form();
@@ -236,7 +273,8 @@ function _process_edit() {
                 'video_width' => $fields['video_width'],
                 'video_height' => $fields['video_height'],
                 'status' => isset($_POST['status']),
-                'highlight' => isset($_POST['status'])
+                'highlight' => isset($_POST['status']),
+                'category' => $fields['category']
             ),
             array('id' => $video_id),
             array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d'),
@@ -291,6 +329,7 @@ function _process_edit() {
     }
 
     $ctx['fields']['id'] = $video_id;
+    $ctx['terms'] = get_terms( 'video_category', array( 'hide_empty' => false ) );
     return $ctx;
 }
 
@@ -418,7 +457,8 @@ function _process_add() {
             'video_width' => $fields['video_width'],
             'video_height' => $fields['video_height'],
             'status' => isset($_POST['status']),
-            'highlight' => isset($_POST['status'])
+            'highlight' => isset($_POST['status']),
+            'category' => isset($_POST['category'])
         ),
         array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d')
     );
@@ -502,9 +542,11 @@ function wpgd_admin_videos_install() {
     /* definition of tables that holds videos and sources */
     $videos = $wpdb->prefix . "wpgd_admin_videos";
     $sources = $wpdb->prefix . "wpgd_admin_videos_sources";
+    $categories = $wpdb->prefix . "wpgd_admin_videos_categories";
     $sql = "CREATE TABLE " . $videos . " (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
         title VARCHAR(200) NOT NULL,
+        category mediumint(9) NULL,
         date datetime DEFAULT " . $now . " NOT NULL,
         author VARCHAR(200) NOT NULL,
         license tinytext NOT NULL,
@@ -517,6 +559,12 @@ function wpgd_admin_videos_install() {
         UNIQUE KEY id (id)
     );
 
+    CREATE TABLE " . $categories . " (
+        id mediumint(9) NOT NULL AUTO_INCREMENT,
+        title VARCHAR(250) NOT NULL,
+        UNIQUE KEY id (id)
+    );
+
     CREATE TABLE " . $sources . " (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
         video_id mediumint(9) NOT NULL,
@@ -524,6 +572,11 @@ function wpgd_admin_videos_install() {
         url VARCHAR(256) NOT NULL,
         UNIQUE KEY id (id)
     );
+
+    ALTER TABLE " . $videos . "
+      ADD CONSTRAINT FK_video_cat
+      FOREIGN KEY (category) REFERENCES " . $categories . "(id);
+
 
     ALTER TABLE " . $sources . "
       ADD CONSTRAINT FK_video
