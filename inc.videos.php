@@ -35,11 +35,19 @@ function wpgd_videos_get_videos($where=null, $orderby=null, $limit=null, $offset
     return $wpdb->get_results($wpdb->prepare($sql));
 }
 
+function wpgd_videos_get_videos_categories($where=null, $orderby=null, $limit=null, $offset=null) {
+    // global $wpdb;
+    $categories = get_terms( 'video_category', 'orderby=count&hide_empty=0' );
+    return $categories;
+}
 
 function wpgd_videos_get_highlighted_videos($limit=null) {
     return wpgd_videos_get_videos("highlight=true", "date DESC", $limit);
 }
 
+function wpgd_videos_get_bycategory($category=null, $orderby=null, $limit=null, $offset=null) {
+    return wpgd_videos_get_videos("category=".$category, $orderby, $limit, $offset);
+}
 
 function wpgd_videos_get_video($vid) {
     global $wpdb;

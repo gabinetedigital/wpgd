@@ -61,6 +61,58 @@ function wpgd_getHighlightedVideos($args) {
 }
 
 
+function wpgd_getVideosCategories($args){
+    if (!is_array($args = _wpgd_method_header($args))) {
+        return $args;
+    }
+
+    /* Just making sure that we can keep rocking */
+    if (!isset($args[0]))
+        $args[0] = array();
+
+    /* These are the parameters that we're waiting for */
+    $names = array('where', 'orderby', 'limit', 'offset');
+    $params = array();
+
+    /* Getting params from the $args array */
+    for ($i = 0; $i < count($names); $i++) {
+        if (array_key_exists($names[$i], $args[0])) {
+            $params[$i] = $args[0][$names[$i]];
+        } else {
+            $params[$i] = null;
+        }
+    }
+
+    return call_user_func_array('wpgd_videos_get_videos_categories', $params);
+
+}
+
+function wpgd_getVideosByCategory($args){
+    if (!is_array($args = _wpgd_method_header($args))) {
+        return $args;
+    }
+
+    /* Just making sure that we can keep rocking */
+    if (!isset($args[0]))
+        $args[0] = array();
+
+    /* These are the parameters that we're waiting for */
+    $names = array('category', 'orderby', 'limit', 'offset');
+    $params = array();
+
+    /* Getting params from the $args array */
+    for ($i = 0; $i < count($names); $i++) {
+        if (array_key_exists($names[$i], $args[0])) {
+            $params[$i] = $args[0][$names[$i]];
+        } else {
+            $params[$i] = null;
+        }
+    }
+
+    return call_user_func_array('wpgd_videos_get_bycategory', $params);
+
+}
+
 /**
  * A wrapper for the function that lists videos
  *
@@ -239,6 +291,8 @@ add_filter('xmlrpc_methods', function ($methods) {
     $methods['wpgd.getVideo'] = 'wpgd_getVideo';
     $methods['wpgd.getVideos'] = 'wpgd_getVideos';
     $methods['wpgd.getHighlightedVideos'] = 'wpgd_getHighlightedVideos';
+    $methods['wpgd.getVideosCategories'] = 'wpgd_getVideosCategories';
+    $methods['wpgd.getVideosByCategory'] = 'wpgd_getVideosByCategory';
     $methods['wpgd.getVideoSources'] = 'wpgd_getVideoSources';
     $methods['wpgd.getGalleries'] = 'wpgd_getGalleries';
     $methods['wpgd.getGallery'] = 'wpgd_getGallery';
