@@ -21,9 +21,9 @@ function wpgd_videos_get_videos($where=null, $orderby=null, $limit=null, $offset
     $videos = $wpdb->prefix . "wpgd_admin_videos";
     $sql = "
       SELECT
-        id, title, date, author, description, thumbnail, category,
-        status, highlight, video_width, video_height
-      FROM $videos ";
+        v.id, v.title, v.date, v.author, v.description, v.thumbnail, v.category, t.name category_name,
+        v.status, v.highlight, v.video_width, v.video_height, v.views
+      FROM $videos v left join `wp_terms` t on v.category = t.term_id ";
     if (isset($where))
         $sql .= "WHERE $where ";
     if (isset($orderby))
@@ -54,9 +54,9 @@ function wpgd_videos_get_video($vid) {
     $table = $wpdb->prefix . "wpgd_admin_videos";
     $sql = "
       SELECT
-        id, title, date, author, description, thumbnail, category,
-        status, video_width, video_height
-      FROM $table
+        v.id, v.title, v.date, v.author, v.description, v.thumbnail, v.category, t.name category_name,
+        v.status, v.video_width, v.video_height, v.views, v.highlight
+      FROM $table  v left join `wp_terms` t on v.category = t.term_id 
       WHERE id = " . $vid;
     return $wpdb->get_row($wpdb->prepare($sql), ARRAY_A);
 }

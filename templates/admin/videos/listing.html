@@ -5,8 +5,10 @@
     <thead>
       <tr>
       	<th style="width:5%">ID</th>
-        <th style="width:10%">Thumbnail</th>
+        <th style="width:7%">Thumbnail</th>
         <th>Title</th>
+        <th style="width:5%">Cagegory</th>
+        <th style="width:5%">Views</th>
         <th>Summary</th>
         <th class="column-date">Date</th>
       </tr>
@@ -39,11 +41,13 @@
             </span>
           </div>
         </td>
+        <td>{{video.category_name}}</td>
+        <td>{{video.views}}</td>
         <td class="column-title">{{ video.description }}</td>
         <td class="date column-date">
           <abbr>{{ video.date|date("d/m/Y") }}</abbr><br>
           {% if not video.status %}Not{% endif %} Published<br>
-          {% if not video.highlight %}Not{% endif %} Highlighted
+          {% if not video.highlight %}Not{% endif %} Highlighted 
         </td>
       </tr>
       {% endfor %}
@@ -51,6 +55,7 @@
 
     <tfoot>
       <tr>
+        <th classs="manage-column sortable desc" scope="col">ID</th>
         <th classs="manage-column sortable desc" scope="col">Thumbnail</th>
         <th classs="manage-column sortable desc" scope="col">Title</th>
         <th classs="manage-column sortable asc" scope="col">Description</th>

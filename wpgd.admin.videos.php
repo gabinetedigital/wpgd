@@ -201,7 +201,7 @@ function wpgd_videos_submenu_categ() {
 
 $video_fields = array(
     'title', 'date', 'author', 'license', 'description', 'category',
-    'video_width', 'video_height', 'thumbnail'
+    'views', 'video_width', 'video_height', 'thumbnail'
 );
 
 
@@ -273,16 +273,19 @@ function _process_edit() {
                 'video_width' => $fields['video_width'],
                 'video_height' => $fields['video_height'],
                 'status' => isset($_POST['status']),
-                'highlight' => isset($_POST['status']),
-                'category' => $fields['category']
+                'highlight' => isset($_POST['highlight']),
+                'category' => $fields['category'],
+                'views' => $fields['views']
             ),
             array('id' => $video_id),
             array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d'),
             array('%d')
         );
+
         $ctx['fields'] = $fields;
         $ctx['fields']['status'] = isset($_POST['status']);
         $ctx['fields']['highlight'] = isset($_POST['highlight']);
+        // $ctx['fields']['views'] = $fields['views'];
 
         /* Updating sources */
         $handled_sources = array();
@@ -326,6 +329,8 @@ function _process_edit() {
         }
 
         $ctx['source_fields'] = $sources;
+
+        $ctx["message_ok"] = "Video saved.";
     }
 
     $ctx['fields']['id'] = $video_id;
@@ -457,8 +462,9 @@ function _process_add() {
             'video_width' => $fields['video_width'],
             'video_height' => $fields['video_height'],
             'status' => isset($_POST['status']),
-            'highlight' => isset($_POST['status']),
-            'category' => isset($_POST['category'])
+            'highlight' => isset($_POST['highlight']),
+            'category' => isset($_POST['category']),
+            'views' => isset($_POST['views'])
         ),
         array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d')
     );
@@ -542,11 +548,20 @@ function wpgd_admin_videos_install() {
     /* definition of tables that holds videos and sources */
     $videos = $wpdb->prefix . "wpgd_admin_videos";
     $sources = $wpdb->prefix . "wpgd_admin_videos_sources";
-    $categories = $wpdb->prefix . "wpgd_admin_videos_categories";
+    // $categories = $wpdb->prefix . "wpgd_admin_videos_categories";
+
+    // CREATE TABLE " . $categories . " (
+    //     id mediumint(9) NOT NULL AUTO_INCREMENT,
+    //     title VARCHAR(250) NOT NULL,
+    //     UNIQUE KEY id (id)
+    // );
+
+
     $sql = "CREATE TABLE " . $videos . " (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
         title VARCHAR(200) NOT NULL,
         category mediumint(9) NULL,
+        views mediumint(9) NULL,
         date datetime DEFAULT " . $now . " NOT NULL,
         author VARCHAR(200) NOT NULL,
         license tinytext NOT NULL,
@@ -556,12 +571,6 @@ function wpgd_admin_videos_install() {
         thumbnail VARCHAR(256) NOT NULL,
         video_width integer NOT NULL,
         video_height integer NOT NULL,
-        UNIQUE KEY id (id)
-    );
-
-    CREATE TABLE " . $categories . " (
-        id mediumint(9) NOT NULL AUTO_INCREMENT,
-        title VARCHAR(250) NOT NULL,
         UNIQUE KEY id (id)
     );
 

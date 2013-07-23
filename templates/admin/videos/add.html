@@ -5,6 +5,13 @@
   {% else %}
   <h2>Add New Video</h2>
   {% endif %}
+
+  {% if message_ok %}
+  <div class="updated" id="message"><p>
+    {{message_ok}}
+  </p></div>
+  {% endif %}
+
   <form id="video" method="post" class="form-wrap"
         {% if edit %}
         action="admin.php?page=gd-videos-edit&video_id={{ fields.id }}"
@@ -252,6 +259,12 @@
               {%endif%}
             </select>
 
+          </div>
+
+          <div class="form-field form-required">
+            <label>Views</label>
+            <input type="text" name="views" id="views"
+                   value="{{ fields.views }}">
           </div>
 
         </div> <!-- #col-left -->
