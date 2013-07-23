@@ -61,6 +61,32 @@ function wpgd_getHighlightedVideos($args) {
 }
 
 
+function wpgd_setVideoViews($args){
+
+    global $wpdb;
+    $videos_table = $wpdb->prefix . "wpgd_admin_videos";
+
+    if (!is_array($args = _wpgd_method_header($args))) {
+        return $args;
+    }
+
+    /* Just making sure that we can keep rocking */
+    if (!isset($args[1]))
+        return null;
+    if (!isset($args[2]))
+        return null;
+
+    $wpdb->update(
+        $videos_table,
+        array(
+            'views' => $args[1]
+        ),
+        array('id' => $args[2])
+    );
+
+}
+
+
 function wpgd_getVideosCategories($args){
     if (!is_array($args = _wpgd_method_header($args))) {
         return $args;
@@ -293,6 +319,7 @@ add_filter('xmlrpc_methods', function ($methods) {
     $methods['wpgd.getHighlightedVideos'] = 'wpgd_getHighlightedVideos';
     $methods['wpgd.getVideosCategories'] = 'wpgd_getVideosCategories';
     $methods['wpgd.getVideosByCategory'] = 'wpgd_getVideosByCategory';
+    $methods['wpgd.setVideoViews'] = 'wpgd_setVideoViews';
     $methods['wpgd.getVideoSources'] = 'wpgd_getVideoSources';
     $methods['wpgd.getGalleries'] = 'wpgd_getGalleries';
     $methods['wpgd.getGallery'] = 'wpgd_getGallery';
