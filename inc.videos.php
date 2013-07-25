@@ -32,6 +32,7 @@ function wpgd_videos_get_videos($where=null, $orderby=null, $limit=null, $offset
         $sql .= "LIMIT $limit ";
     if (isset($offset))
         $sql .= "OFFSET $offset ";
+    // error_log($sql);
     return $wpdb->get_results($wpdb->prepare($sql));
 }
 
@@ -42,7 +43,7 @@ function wpgd_videos_get_videos_categories($where=null, $orderby=null, $limit=nu
 }
 
 function wpgd_videos_get_highlighted_videos($limit=null) {
-    return wpgd_videos_get_videos("highlight=true", "date DESC", $limit);
+    return wpgd_videos_get_videos("highlight=1", "date DESC", $limit);
 }
 
 function wpgd_videos_get_bycategory($category=null, $orderby=null, $limit=null, $offset=null) {
