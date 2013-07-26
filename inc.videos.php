@@ -22,7 +22,7 @@ function wpgd_videos_get_videos($where=null, $orderby=null, $limit=null, $offset
     $sql = "
       SELECT
         v.id, v.title, v.date, v.author, v.description, v.thumbnail, v.category, t.name category_name,
-        v.status, v.highlight, v.video_width, v.video_height, v.views
+        v.status, v.highlight, v.video_width, v.video_height, v.views, v.subtitle
       FROM $videos v left join `wp_terms` t on v.category = t.term_id ";
     if (isset($where))
         $sql .= "WHERE $where ";
@@ -56,7 +56,7 @@ function wpgd_videos_get_video($vid) {
     $sql = "
       SELECT
         v.id, v.title, v.date, v.author, v.description, v.thumbnail, v.category, t.name category_name,
-        v.status, v.video_width, v.video_height, v.views, v.highlight
+        v.status, v.video_width, v.video_height, v.views, v.highlight, v.subtitle
       FROM $table  v left join `wp_terms` t on v.category = t.term_id 
       WHERE id = " . $vid;
     return $wpdb->get_row($wpdb->prepare($sql), ARRAY_A);

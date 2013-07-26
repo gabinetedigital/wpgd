@@ -201,7 +201,7 @@ function wpgd_videos_submenu_categ() {
 
 $video_fields = array(
     'title', 'date', 'author', 'license', 'description', 'category',
-    'views', 'video_width', 'video_height', 'thumbnail'
+    'views', 'video_width', 'video_height', 'thumbnail', 'subtitle'
 );
 
 
@@ -261,6 +261,10 @@ function _process_edit() {
         $date = date_format(date_create_from_format(
             "d/m/Y", $fields['date']), 'Y-m-d H:i:s');
 
+        error_log("SALVANDO: >> ");
+        error_log(print_r($fields, true));
+        error_log("SALVANDO: << ");
+
         $wpdb->update(
             $videos_table,
             array(
@@ -275,10 +279,11 @@ function _process_edit() {
                 'status' => isset($_POST['status']),
                 'highlight' => isset($_POST['highlight']),
                 'category' => $fields['category'],
-                'views' => $fields['views']
+                'views' => $fields['views'],
+                'subtitle' => $fields['subtitle']
             ),
             array('id' => $video_id),
-            array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d'),
+            array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%d', '%s'),
             array('%d')
         );
 
@@ -464,9 +469,10 @@ function _process_add() {
             'status' => isset($_POST['status']),
             'highlight' => isset($_POST['highlight']),
             'category' => isset($_POST['category']),
-            'views' => isset($_POST['views'])
+            'views' => isset($_POST['views']),
+            'subtitle' => $fields['subtitle']
         ),
-        array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d')
+        array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%d', '%s')
     );
 
     /* This info will be needed when adding sources */
@@ -560,6 +566,7 @@ function wpgd_admin_videos_install() {
     $sql = "CREATE TABLE " . $videos . " (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
         title VARCHAR(200) NOT NULL,
+        subtitle VARCHAR(400) NULL,
         category mediumint(9) NULL,
         views mediumint(9) NULL,
         date datetime DEFAULT " . $now . " NOT NULL,
