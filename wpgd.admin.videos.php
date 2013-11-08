@@ -144,11 +144,11 @@ function wpgd_videos_menu() {
         'manage_options', 'gd-videos-add', 'wpgd_videos_submenu_add');
 
     // 'edit-tags.php?taxonomy=video_category',
-    add_submenu_page( 
+    add_submenu_page(
         $menupage, 'Categories', 'Categories',
         'manage_options', 'edit-tags.php?taxonomy=video_category');
 
-    add_submenu_page( 
+    add_submenu_page(
         $menupage, 'Videos in home', 'Videos in home',
         'manage_options', 'gd-videos-home', 'wpgd_videos_submenu_home');
 
@@ -201,7 +201,7 @@ function wpgd_videos_submenu_categ() {
 
 $video_fields = array(
     'title', 'date', 'author', 'license', 'description', 'category',
-    'views', 'video_width', 'video_height', 'thumbnail', 'subtitle'
+    'views', 'video_width', 'video_height', 'thumbnail' #, 'subtitle'
 );
 
 
@@ -261,8 +261,12 @@ function _process_edit() {
         $date = date_format(date_create_from_format(
             "d/m/Y", $fields['date']), 'Y-m-d H:i:s');
 
+        $fields['subtitle'] = $_REQUEST['subtitle'];
+
         error_log("SALVANDO: >> ");
         error_log(print_r($fields, true));
+        error_log(print_r($ctx['fields'], true));
+        error_log(print_r($_REQUEST, true));
         error_log("SALVANDO: << ");
 
         $wpdb->update(
@@ -398,12 +402,12 @@ function __validate_form() {
     /* Validating the source received from the form */
     $_validated_sources = __validate_sources();
     $sources = $_validated_sources['sources'];
-    $incomplete_sources = $_validated_sources['incomplete_sources'];  
-        
-    
+    $incomplete_sources = $_validated_sources['incomplete_sources'];
+
+
     try {
         $fields = _validate_array($video_fields);
-        
+
         /* Maybe it's everything ok with the normal fields, but
            let's find out what happened in the source list
            validation */
@@ -413,13 +417,13 @@ function __validate_form() {
         return array('sources' => $sources, 'fields' => $fields);
 
     } catch (ValidationException $exc) {
-    	
+
     	$array = $_POST;
-    	
+
     	foreach ($video_fields as $item) {
-    		$clear[$item] = stripslashes(trim($array[$item]));    		
+    		$clear[$item] = stripslashes(trim($array[$item]));
     	}
-    	
+
         throw new ValidationException(array(
             'errors' => $exc->getErrors(),
             'fields' => $clear,
@@ -449,11 +453,13 @@ function _process_add() {
         return $exc->getErrors();
     }
 
+    $fields['subtitle'] = $_REQUEST['subtitle'];
+
     /* Date field handling */
     /* FIXME: hardcoded date format */
     $date = date_format(date_create_from_format(
-        "d/m/Y", $fields['date']), 'Y-m-d H:i:s');    
-    
+        "d/m/Y", $fields['date']), 'Y-m-d H:i:s');
+
     /* Finally, inserting the video */
     $wpdb->insert(
         $videos_table,
@@ -518,7 +524,7 @@ function wpgd_admin_videos_shortcode($atts){
             $url_video_webm = $s['url'];
         }
     }
-    
+
     $txtreturn  = "\n<video id=\"$id\" poster=\"".$video['thumbnail']."\" width=\"$width\" height=\"$height\">";
 
     if( $url_video_ogg != "" ){

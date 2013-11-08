@@ -32,7 +32,7 @@ function wpgd_videos_get_videos($where=null, $orderby=null, $limit=null, $offset
         $sql .= "LIMIT $limit ";
     if (isset($offset))
         $sql .= "OFFSET $offset ";
-    // error_log($sql);
+    error_log($sql);
     return $wpdb->get_results($wpdb->prepare($sql));
 }
 
@@ -57,7 +57,7 @@ function wpgd_videos_get_video($vid) {
       SELECT
         v.id, v.title, v.date, v.author, v.description, v.thumbnail, v.category, t.name category_name,
         v.status, v.video_width, v.video_height, v.views, v.highlight, v.subtitle
-      FROM $table  v left join `wp_terms` t on v.category = t.term_id 
+      FROM $table  v left join `wp_terms` t on v.category = t.term_id
       WHERE id = " . $vid;
     return $wpdb->get_row($wpdb->prepare($sql), ARRAY_A);
 }
