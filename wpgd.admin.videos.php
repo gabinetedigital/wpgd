@@ -229,6 +229,7 @@ function _process_edit() {
     $video_id = $_REQUEST['video_id'];
     $videos_table = $wpdb->prefix . "wpgd_admin_videos";
     $sources_table = $wpdb->prefix . "wpgd_admin_videos_sources";
+    $video_categories = $wpdb->prefix . "wpgd_admin_videos_categories";
     $ctx = array('edit' => true);
 
     /* Getting the video attributes */
@@ -263,12 +264,7 @@ function _process_edit() {
 
         $fields['subtitle'] = $_REQUEST['subtitle'];
 
-        error_log("SALVANDO: >> ");
-        error_log(print_r($fields, true));
-        error_log(print_r($ctx['fields'], true));
-        error_log(print_r($_REQUEST, true));
-        error_log("SALVANDO: << ");
-
+        error_log("gravando CATEGORY:".$fields['category']);
         $wpdb->update(
             $videos_table,
             array(
@@ -282,14 +278,38 @@ function _process_edit() {
                 'video_height' => $fields['video_height'],
                 'status' => isset($_POST['status']),
                 'highlight' => isset($_POST['highlight']),
-                'category' => $fields['category'],
+                // 'category' => $fields['category'],
                 'views' => $fields['views'],
                 'subtitle' => $fields['subtitle']
             ),
             array('id' => $video_id),
-            array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%d', '%s'),
+            array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s'),
             array('%d')
         );
+
+        #recebe as categorias dos videos em uma string com virgulas
+        $cats = split(",",$fields['category']);
+        #exclui todas categorias dos videos
+        $wpdb->query(
+            $wpdb->prepare("
+                DELETE FROM $video_categories
+                WHERE id_video = %d
+                ",
+                $video_id
+            )
+        );
+        #insere novamente só as que estavam marcadas
+        foreach($cats as $c){
+            if( ! empty($c) ){
+                $wpdb->insert($video_categories,
+                    array(
+                        'id_video' => $video_id,
+                        'id_cat' => $c
+                    ),
+                    array('%d', '%d')
+                );
+            }
+        }
 
         $ctx['fields'] = $fields;
         $ctx['fields']['status'] = isset($_POST['status']);
@@ -404,7 +424,6 @@ function __validate_form() {
     $sources = $_validated_sources['sources'];
     $incomplete_sources = $_validated_sources['incomplete_sources'];
 
-
     try {
         $fields = _validate_array($video_fields);
 
@@ -414,14 +433,16 @@ function __validate_form() {
         if (sizeof($sources) === 0) {
             throw new ValidationException(array());
         }
+        error_log("VALIDADE FORM");
+        error_log( print_r($fields,true) );
+        error_log("VALIDADE FORM");
         return array('sources' => $sources, 'fields' => $fields);
 
     } catch (ValidationException $exc) {
-
     	$array = $_POST;
 
     	foreach ($video_fields as $item) {
-    		$clear[$item] = stripslashes(trim($array[$item]));
+		  $clear[$item] = stripslashes(trim($array[$item]));
     	}
 
         throw new ValidationException(array(
@@ -443,6 +464,7 @@ function _process_add() {
     global $wpdb;
     $videos_table = $wpdb->prefix . "wpgd_admin_videos";
     $sources_table = $wpdb->prefix . "wpgd_admin_videos_sources";
+    $video_categories = $wpdb->prefix . "wpgd_admin_videos_categories";
 
     /* Validating the rest of the form */
     try {
@@ -474,12 +496,36 @@ function _process_add() {
             'video_height' => $fields['video_height'],
             'status' => isset($_POST['status']),
             'highlight' => isset($_POST['highlight']),
-            'category' => isset($_POST['category']),
+            // 'category' => isset($_POST['category']),
             'views' => isset($_POST['views']),
             'subtitle' => $fields['subtitle']
         ),
-        array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%d', '%s')
+        array('%s', '%s', '%s', '%s', '%s', '%s', '%d', '%d', '%d', '%d', '%d', '%s')
     );
+
+    #recebe as categorias dos videos em uma string com virgulas
+    $cats = split(",",$fields['category']);
+    #exclui todas categorias dos videos
+    $wpdb->query(
+        $wpdb->prepare("
+            DELETE FROM $video_categories
+            WHERE id_video = %d
+            ",
+            $video_id
+        )
+    );
+    #insere novamente só as que estavam marcadas
+    foreach($cats as $c){
+        if( ! empty($c) ){
+            $wpdb->insert($video_categories,
+                array(
+                    'id_video' => $video_id,
+                    'id_cat' => $c
+                ),
+                array('%d', '%d')
+            );
+        }
+    }
 
     /* This info will be needed when adding sources */
     $video_id = $wpdb->insert_id;
@@ -560,16 +606,16 @@ function wpgd_admin_videos_install() {
     /* definition of tables that holds videos and sources */
     $videos = $wpdb->prefix . "wpgd_admin_videos";
     $sources = $wpdb->prefix . "wpgd_admin_videos_sources";
-    // $categories = $wpdb->prefix . "wpgd_admin_videos_categories";
+    $video_categories = $wpdb->prefix . "wpgd_admin_videos_categories";
 
-    // CREATE TABLE " . $categories . " (
-    //     id mediumint(9) NOT NULL AUTO_INCREMENT,
-    //     title VARCHAR(250) NOT NULL,
-    //     UNIQUE KEY id (id)
-    // );
+    $sql = "
+    CREATE TABLE  $video_categories  (
+        id_video mediumint(9) NOT NULL,
+        id_cat   mediumint(9) NOT NULL,
+        UNIQUE KEY id_vid_cat (id_video, id_cat)
+    );
 
-
-    $sql = "CREATE TABLE " . $videos . " (
+    CREATE TABLE " . $videos . " (
         id mediumint(9) NOT NULL AUTO_INCREMENT,
         title VARCHAR(200) NOT NULL,
         subtitle VARCHAR(400) NULL,

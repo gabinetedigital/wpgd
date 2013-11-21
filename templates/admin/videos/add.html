@@ -254,13 +254,13 @@
 
 
           <div class="form-field form-required">
-            <label>Category</label>
+            <label>Category {{fields.category}}</label>
 
-            <select name="category">
+            <select name="category[]" multiple>
               <option value="0"> - Sem categoria - </option>
               {%if terms%}
                 {% for term in terms%}
-                  <option value="{{ term.term_id }}" {%if term.term_id == fields.category %}selected="selected"{%endif%}>{{ term.name }}</option>
+                  <option value="{{ term.term_id }}" {%if term.term_id in fields.category %}selected="selected"{%endif%}>{{ term.name }}</option>
                 {% endfor %}
               {%endif%}
             </select>

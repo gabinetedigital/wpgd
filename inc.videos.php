@@ -18,12 +18,15 @@
 
 function wpgd_videos_get_videos($where=null, $orderby=null, $limit=null, $offset=null) {
     global $wpdb;
+    error_log(">>>>>>>>>>>>>>>> wpgd_videos_get_videos");
     $videos = $wpdb->prefix . "wpgd_admin_videos";
     $sql = "
       SELECT
-        v.id, v.title, v.date, v.author, v.description, v.thumbnail, v.category, t.name category_name,
+        v.id, v.title, v.date, v.author, v.description, v.thumbnail, c.id_cat category, t.name category_name,
         v.status, v.highlight, v.video_width, v.video_height, v.views, v.subtitle
-      FROM $videos v left join `wp_terms` t on v.category = t.term_id ";
+      FROM $videos v
+        LEFT JOIN `wp_wpgd_admin_videos_categories` c
+        LEFT JOIN `wp_terms` t on c.id_cat = t.term_id on v.id = c.id_video ";
     if (isset($where))
         $sql .= "WHERE $where ";
     if (isset($orderby))
@@ -43,11 +46,33 @@ function wpgd_videos_get_videos_categories($where=null, $orderby=null, $limit=nu
 }
 
 function wpgd_videos_get_highlighted_videos($limit=null) {
+    error_log(">>>>>>>>>>>>>>>> wpgd_videos_get_highlighted_videos");
     return wpgd_videos_get_videos("highlight=1", "date DESC", $limit);
 }
 
 function wpgd_videos_get_bycategory($category=null, $orderby=null, $limit=null, $offset=null) {
-    return wpgd_videos_get_videos("category=".$category, $orderby, $limit, $offset);
+    // return wpgd_videos_get_videos("category=".$category, $orderby, $limit, $offset);
+    error_log(">>>>>>>>>>>>>>>> wpgd_videos_get_bycategory");
+    global $wpdb;
+    $videos = $wpdb->prefix . "wpgd_admin_videos";
+    $sql = "
+        SELECT v.id, v.title, v.date, v.author, v.description, v.thumbnail,
+               c.id_cat category, t.name category_name, v.status, v.highlight,
+               v.video_width, v.video_height, v.views, v.subtitle
+        FROM $videos v
+        LEFT JOIN `wp_wpgd_admin_videos_categories` c
+        LEFT JOIN `wp_terms` t on c.id_cat = t.term_id on v.id = c.id_video ";
+    if (isset($category))
+        $sql .= "WHERE c.id_cat = $category ";
+    if (isset($orderby))
+        $sql .= "ORDER BY $orderby ";
+    if (isset($limit))
+        $sql .= "LIMIT $limit ";
+    if (isset($offset))
+        $sql .= "OFFSET $offset ";
+    error_log($sql);
+    return $wpdb->get_results($wpdb->prepare($sql));
+
 }
 
 function wpgd_videos_get_video($vid) {
@@ -55,11 +80,13 @@ function wpgd_videos_get_video($vid) {
     $table = $wpdb->prefix . "wpgd_admin_videos";
     $sql = "
       SELECT
-        v.id, v.title, v.date, v.author, v.description, v.thumbnail, v.category, t.name category_name,
+        v.id, v.title, v.date, v.author, v.description, v.thumbnail, c.id_cat category, t.name category_name,
         v.status, v.video_width, v.video_height, v.views, v.highlight, v.subtitle
-      FROM $table  v left join `wp_terms` t on v.category = t.term_id
-      WHERE id = " . $vid;
-    return $wpdb->get_row($wpdb->prepare($sql), ARRAY_A);
+      FROM $table v
+        LEFT JOIN `wp_wpgd_admin_videos_categories` c
+        LEFT JOIN `wp_terms` t on c.id_cat = t.term_id on v.id = c.id_video
+      WHERE v.id = " . $vid;
+    return $wpdb->get_results($wpdb->prepare($sql), ARRAY_A);
 }
 
 

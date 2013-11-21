@@ -35,18 +35,27 @@ class ValidationException extends Exception {
 function _validate_array($fields, $array=null) {
     $clear = array();
     $errors = array();
-        
+
     if ($array === null) {
         $array = $_POST;
-    }    
-  
+    }
+
     foreach ($fields as $item) {
-        $clear[$item] = stripslashes(trim($array[$item]));
+        if(is_array($array[$item])){
+            $tmpcont = "";
+            foreach ($array[$item] as $itemcont)
+            {
+                $tmpcont .= "$itemcont,";
+            }
+            $clear[$item] = $tmpcont;
+        }else{
+            $clear[$item] = stripslashes(trim($array[$item]));
+        }
         if ($clear[$item] === '') {
             $errors[] = $item;
         }
-    }    
-    
+    }
+
     if (sizeof($errors) > 0) {
         throw new ValidationException($errors);
     }
