@@ -44,13 +44,15 @@
             </span>
           </div>
         </td>
-        <td>{{video.category_name}}</td>
+        <td>
+          {{video.category_name}}
+        </td>
         <td>{{video.views}}</td>
         <td class="column-title">{{ video.description }}</td>
         <td class="date column-date">
           <abbr>{{ video.date|date("d/m/Y") }}</abbr><br>
           {% if not video.status %}Not{% endif %} Published<br>
-          {% if not video.highlight %}Not{% endif %} Highlighted 
+          {% if not video.highlight %}Not{% endif %} Highlighted
         </td>
       </tr>
       {% endfor %}

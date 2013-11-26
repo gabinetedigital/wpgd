@@ -106,4 +106,20 @@ function wpgd_videos_remove_video($vid) {
     return $wpdb->query($wpdb->prepare($sql, $vid));
 }
 
+function wpgd_videos_consolidate_category($videos){
+    #This method consolidates all videos with your categories in only one line by video.
+    $todos = array();
+    foreach ($videos as $video){
+        if( !isset($todos[$video->id]) ){
+            $todos[$video->id] = clone $video;
+        }else{
+            $video->category = $todos[$video->id]->category .",". $video->category;
+            $video->category_name = $todos[$video->id]->category_name . "," . $video->category_name;
+            unset($todos[$video->id]);
+            $todos[$video->id] = $video;
+        }
+    }
+    return $todos;
+}
+
 ?>

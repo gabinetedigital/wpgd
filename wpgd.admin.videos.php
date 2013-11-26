@@ -212,7 +212,9 @@ $source_fields = array(
 
 function _process_listing() {
     $ctx = array();
-    $ctx['listing'] = wpgd_videos_get_videos(null, "date DESC");
+    error_log("PROCESS LISTING >>>>>>>>>>>>>>>>>>>");
+    $ctx['listing'] = wpgd_videos_consolidate_category( wpgd_videos_get_videos(null, "date DESC") );
+    $ctx['terms'] = get_terms( 'video_category', array( 'hide_empty' => false ) );
     return $ctx;
 }
 
@@ -220,6 +222,7 @@ function _process_listing() {
 function _process_home() {
     $ctx = array();
     $ctx['listing'] = wpgd_videos_get_highlighted_videos();
+    $ctx['terms'] = get_terms( 'video_category', array( 'hide_empty' => false ) );
     return $ctx;
 }
 
@@ -233,7 +236,8 @@ function _process_edit() {
     $ctx = array('edit' => true);
 
     /* Getting the video attributes */
-    $ctx['fields'] = wpgd_videos_get_video($video_id);
+    $vd = wpgd_videos_get_video($video_id);
+    $ctx['fields'] = $vd[0];
 
     /* Formatting date as the user expects to see */
     $date = $ctx['fields']['date'];
@@ -374,7 +378,8 @@ function _process_remove() {
        of a nasty redirect issue explained there. Please, don't blame
        me. */
     $ctx = array();
-    $ctx['video'] = wpgd_videos_get_video($_GET['video_id']);
+    $vd = wpgd_videos_get_video($_GET['video_id']);
+    $ctx['video'] = $vd[0];
     return $ctx;
 }
 
@@ -556,7 +561,8 @@ function wpgd_admin_videos_shortcode($atts){
         'height' => '290'
      ), $atts));
 
-    $video = wpgd_videos_get_video($id);
+    $vd = wpgd_videos_get_video($id);
+    $video = $vd[0];
     $sources = wpgd_videos_get_sources($id);
 
     foreach ( $sources as $s ){
